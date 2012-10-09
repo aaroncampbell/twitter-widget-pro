@@ -2,9 +2,9 @@
 Contributors: aaroncampbell
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=paypal%40xavisys%2ecom&item_name=Twitter%20Widget%20Pro&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: twitter, widget, feed
-Requires at least: 2.5
-Tested up to: 2.5.1
-Stable tag: 1.2.2
+Requires at least: 2.7
+Tested up to: 2.7.1
+Stable tag: 1.3.0
 
 A widget that properly handles twitter feeds, including parsing @username and URLs into links. Requires PHP5.
 
@@ -34,3 +34,10 @@ Absolutely, each instance of the widget can have different settings and track di
 = Why can't I display a friends feed anymore? =
 
 Aparently the database queries required to display the friends feed was causing twitter to crash, so they removed it.  Unfortunately, this is outside my control.
+
+== Screenshots ==
+
+1. To user the widget, go to Appearance -> Widgets and choose to "Add" the "Twitter Feed" widget.
+2. Each widget has settings that need to be set, so the next step is to click "edit" on the newly added widget and adjust all the settings.  When you're done click "Save Changes"
+3. This is what the widget looks like in the default theme with no added styles.
+4. By using some (X)HTML in the title element and adding a few styles and a background image, you could make it look like this.
