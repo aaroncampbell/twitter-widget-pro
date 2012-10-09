@@ -4,18 +4,18 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=paypal%4
 Tags: twitter, widget, feed
 Requires at least: 2.7
 Tested up to: 2.8
-Stable tag: 1.3.5
+Stable tag: 1.3.4
 
-A widget that properly handles twitter feeds, including parsing @username and URLs into links. Requires PHP5.
+A widget that properly handles twitter feeds, including parsing @username, #hashtags, and URLs into links. Requires PHP5.
 
 == Description ==
 
-A widget that properly handles twitter feeds, including @username and link
-parsing.  It supports displaying profiles images, and even lets you control
+A widget that properly handles twitter feeds, including @username, #hashtag, and
+link parsing.  It supports displaying profiles images, and even lets you control
 whether to display the time and date of a tweet or how log ago it happened
 (about 5 hours ago, etc).  Requires PHP5.
 
-You may also be interested in WordPress tips and tricks at <a href="http://wpinformer.com">WordPress Informer</a>
+You may also be interested in WordPress tips and tricks at <a href="http://wpinformer.com">WordPress Informer</a> or gerneral <a href="http://webdevnews.net">Web Developer News</a>
 
 == Installation ==
 
