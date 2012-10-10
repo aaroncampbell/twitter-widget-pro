@@ -3,7 +3,7 @@
  * Plugin Name: Twitter Widget Pro
  * Plugin URI: http://xavisys.com/wordpress-plugins/wordpress-twitter-widget/
  * Description: A widget that properly handles twitter feeds, including @username, #hashtag, and link parsing.  It can even display profile images for the users.  Requires PHP5.
- * Version: 2.3.0
+ * Version: 2.3.2
  * Author: Aaron D. Campbell
  * Author URI: http://xavisys.com/
  * License: GPLv2 or later
@@ -82,11 +82,11 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 			<p>
 				<label for="<?php echo $this->get_field_id( 'avatar' ); ?>"><?php _e( 'Display profile image?', $this->_slug ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'avatar' ); ?>" name="<?php echo $this->get_field_name( 'avatar' ); ?>">
-					<option value=""<?php selected( $instance['avatar'], '' ) ?>>Do not show</option>
-					<option value="mini"<?php selected( $instance['avatar'], 'mini' ) ?>>Mini - 24px by 24px</option>
-					<option value="normal"<?php selected( $instance['avatar'], 'normal' ) ?>>Normal - 48px by 48px</option>
-					<option value="bigger"<?php selected( $instance['avatar'], 'bigger' ) ?>>Bigger - 73px by 73px</option>
-					<option value="original"<?php selected( $instance['avatar'], 'original' ) ?>>Original</option>
+					<option value=""<?php selected( $instance['avatar'], '' ) ?>><?php _e( 'Do not show', $this->_slug ); ?></option>
+					<option value="mini"<?php selected( $instance['avatar'], 'mini' ) ?>><?php _e( 'Mini - 24px by 24px', $this->_slug ); ?></option>
+					<option value="normal"<?php selected( $instance['avatar'], 'normal' ) ?>><?php _e( 'Normal - 48px by 48px', $this->_slug ); ?></option>
+					<option value="bigger"<?php selected( $instance['avatar'], 'bigger' ) ?>><?php _e( 'Bigger - 73px by 73px', $this->_slug ); ?></option>
+					<option value="original"<?php selected( $instance['avatar'], 'original' ) ?>><?php _e( 'Original', $this->_slug ); ?></option>
 				</select>
 			</p>
 			<p>
@@ -102,10 +102,12 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				<label for="<?php echo $this->get_field_id( 'hidefrom' ); ?>"><?php _e( 'Hide sending applications', $this->_slug ); ?></label>
 			</p>
 			<p>
+				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showintents' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showintents' ); ?>" name="<?php echo $this->get_field_name( 'showintents' ); ?>"<?php checked( $instance['showintents'], 'true' ); ?> />
 				<label for="<?php echo $this->get_field_id( 'showintents' ); ?>"><?php _e( 'Show Tweet Intents (reply, retweet, favorite)', $this->_slug ); ?></label>
 			</p>
 			<p>
+				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showfollow' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showfollow' ); ?>" name="<?php echo $this->get_field_name( 'showfollow' ); ?>"<?php checked( $instance['showfollow'], 'true' ); ?> />
 				<label for="<?php echo $this->get_field_id( 'showfollow' ); ?>"><?php _e( 'Show Follow Link', $this->_slug ); ?></label>
 			</p>
@@ -268,11 +270,11 @@ class wpTwitterWidget extends XavisysPlugin {
 						</th>
 						<td>
 							<select id="twp_avatar" name="twp[avatar]">
-								<option value=""<?php selected( $this->_settings['twp']['avatar'], '' ) ?>>Do not show</option>
-								<option value="mini"<?php selected( $this->_settings['twp']['avatar'], 'mini' ) ?>>Mini - 24px by 24px</option>
-								<option value="normal"<?php selected( $this->_settings['twp']['avatar'], 'normal' ) ?>>Normal - 48px by 48px</option>
-								<option value="bigger"<?php selected( $this->_settings['twp']['avatar'], 'bigger' ) ?>>Bigger - 73px by 73px</option>
-								<option value="original"<?php selected( $this->_settings['twp']['avatar'], 'original' ) ?>>Original</option>
+								<option value=""<?php selected( $this->_settings['twp']['avatar'], '' ) ?>><?php _e( 'Do not show', $this->_slug ); ?></option>
+								<option value="mini"<?php selected( $this->_settings['twp']['avatar'], 'mini' ) ?>><?php _e( 'Mini - 24px by 24px', $this->_slug ); ?></option>
+								<option value="normal"<?php selected( $this->_settings['twp']['avatar'], 'normal' ) ?>><?php _e( 'Normal - 48px by 48px', $this->_slug ); ?></option>
+								<option value="bigger"<?php selected( $this->_settings['twp']['avatar'], 'bigger' ) ?>><?php _e( 'Bigger - 73px by 73px', $this->_slug ); ?></option>
+								<option value="original"<?php selected( $this->_settings['twp']['avatar'], 'original' ) ?>><?php _e( 'Original', $this->_slug ); ?></option>
 							</select>
 						</td>
 					</tr>
@@ -330,9 +332,11 @@ class wpTwitterWidget extends XavisysPlugin {
 							<input class="checkbox" type="checkbox" value="true" id="twp_hidefrom" name="twp[hidefrom]"<?php checked( $this->_settings['twp']['hidefrom'], 'true' ); ?> />
 							<label for="twp_hidefrom"><?php _e( 'Hide sending applications', $this->_slug ); ?></label>
 							<br />
+							<input type="hidden" value="false" name="twp[showintents]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_showintents" name="twp[showintents]"<?php checked( $this->_settings['twp']['showintents'], 'true' ); ?> />
 							<label for="twp_showintents"><?php _e( 'Show Tweet Intents (reply, retweet, favorite)', $this->_slug ); ?></label>
 							<br />
+							<input type="hidden" value="false" name="twp[showfollow]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_showfollow" name="twp[showfollow]"<?php checked( $this->_settings['twp']['showfollow'], 'true' ); ?> />
 							<label for="twp_showfollow"><?php _e( 'Show Follow Link', $this->_slug ); ?></label>
 							<br />
