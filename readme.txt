@@ -130,6 +130,9 @@ Aparently the database queries required to display the friends feed was causing 
 
 == Upgrade Notice ==
 
+= 2.4.0 =
+Better linking to fix issues with links followed by punctuation
+
 = 2.3.11 =
 Fix issue with "Include Retweets" not unchecking
 
@@ -167,6 +170,13 @@ Fixes an issue with the intents and follow settings not being saved
 Fewer "could not connect to Twitter" messages, new links (reply, retweet, favorite), new follow button, and avatar fixes
 
 == Changelog ==
+
+= 2.4.0 =
+* Better linking of URLs, especially handling of punctuation at end of URLs
+* More efficient regex for link parsing
+* Link FTP links
+* Link E-Mail addresses
+* Complete conversion to Range plugin framework from Xavisys framework
 
 = 2.3.11 =
 * Fix issue with "Include Retweets" not unchecking
