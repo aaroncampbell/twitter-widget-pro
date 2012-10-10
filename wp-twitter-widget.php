@@ -3,7 +3,7 @@
  * Plugin Name: Twitter Widget Pro
  * Plugin URI: http://xavisys.com/wordpress-plugins/wordpress-twitter-widget/
  * Description: A widget that properly handles twitter feeds, including @username, #hashtag, and link parsing.  It can even display profile images for the users.  Requires PHP5.
- * Version: 2.3.2
+ * Version: 2.3.3
  * Author: Aaron D. Campbell
  * Author URI: http://xavisys.com/
  * License: GPLv2 or later
@@ -30,6 +30,7 @@
 
 require_once( 'tlc-transients.php' );
 require_once( 'xavisys-plugin-framework.php' );
+define( 'TWP_VERSION', '2.3.3' );
 
 /**
  * WP_Widget_Twitter_Pro is the class that handles the main widget.
@@ -211,6 +212,10 @@ class wpTwitterWidget extends XavisysPlugin {
 		add_filter( 'widget_twitter_content', 'convert_chars' );
 		add_filter( $this->_slug .'-opt-twp', array( $this, 'filterSettings' ) );
 		add_shortcode( 'twitter-widget', array( $this, 'handleShortcodes' ) );
+
+		$twp_version = get_option( 'twp_version' );
+		if ( TWP_VERSION != $twp_version )
+			update_option( 'twp_version', TWP_VERSION );
 	}
 
 	/**
@@ -535,29 +540,26 @@ class wpTwitterWidget extends XavisysPlugin {
 
 				if ( 'true' == $args['showintents'] ) {
 					$widgetContent .= ' <span class="intent-meta">';
+					$lang = $this->_getTwitterLang();
+					if ( !empty( $lang ) )
+						$linkAttrs['data-lang'] = $lang;
 
 					$linkText = __( 'Reply', $this->_slug );
-					$linkAttrs = array(
-						'href'	=> "http://twitter.com/intent/tweet?in_reply_to={$tweet->id_str}",
-						'class'	=> 'in-reply-to',
-						'title'	=> $linkText,
-					);
+					$linkAttrs['href'] = "http://twitter.com/intent/tweet?in_reply_to={$tweet->id_str}";
+					$linkAttrs['class'] = 'in-reply-to';
+					$linkAttrs['title'] = $linkText;
 					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
 
 					$linkText = __( 'Retweet', $this->_slug );
-					$linkAttrs = array(
-						'href'	=> "http://twitter.com/intent/retweet?tweet_id={$tweet->id_str}",
-						'class'	=> 'retweet',
-						'title'	=> $linkText,
-					);
+					$linkAttrs['href'] = "http://twitter.com/intent/retweet?tweet_id={$tweet->id_str}";
+					$linkAttrs['class'] = 'retweet';
+					$linkAttrs['title'] = $linkText;
 					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
 
 					$linkText = __( 'Favorite', $this->_slug );
-					$linkAttrs = array(
-						'href'	=> "http://twitter.com/intent/favorite?tweet_id={$tweet->id_str}",
-						'class'	=> 'favorite',
-						'title'	=> $linkText,
-					);
+					$linkAttrs['href'] = "http://twitter.com/intent/favorite?tweet_id={$tweet->id_str}";
+					$linkAttrs['class'] = 'favorite';
+					$linkAttrs['title'] = $linkText;
 					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
 					$widgetContent .= '</span>';
 				}
@@ -577,6 +579,10 @@ class wpTwitterWidget extends XavisysPlugin {
 				'class'	=> 'twitter-follow-button',
 				'title'	=> sprintf( __( 'Follow %s', $this->_slug ), "@{$args['username']}" ),
 			);
+			$lang = $this->_getTwitterLang();
+			if ( !empty( $lang ) )
+				$linkAttrs['data-lang'] = $lang;
+
 			$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
 			$widgetContent .= '</div>';
 		}
@@ -602,6 +608,23 @@ class wpTwitterWidget extends XavisysPlugin {
 			}
 		}
 		return $widgetContent;
+	}
+
+	private function _getTwitterLang() {
+		$valid_langs = array(
+			'en', // English
+			'it', // Italian
+			'es', // Spanish
+			'fr', // French
+			'ko', // Korean
+			'ja', // Japanese
+		);
+		$locale = get_locale();
+		$lang = strtolower( substr( get_locale(), 0, 2 ) );
+		if ( in_array( $lang, $valid_langs ) )
+			return $lang;
+
+		return false;
 	}
 
 	public function add_twitter_js() {
