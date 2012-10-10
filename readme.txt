@@ -2,9 +2,9 @@
 Contributors: aaroncampbell
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=paypal%40xavisys%2ecom&item_name=Twitter%20Widget%20Pro&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
 Tags: twitter, widget, feed
-Requires at least: 2.8
+Requires at least: 3.0
 Tested up to: 3.2.1
-Stable tag: 2.2.2
+Stable tag: 2.2.3
 
 A widget that properly handles twitter feeds, including parsing @username, #hashtags, and URLs into links. Requires PHP5.
 
@@ -81,6 +81,9 @@ Aparently the database queries required to display the friends feed was causing 
 
 == Upgrade Notice ==
 
+= 2.2.3 =
+Fixes links on 32 bit servers.  If you are suffering from this I would recommend changing hosts (or talking to yours).
+
 = 2.2.2 =
 Fixes issue introduced in 2.2.1 with an incorrect function name (sorry about that)
 
@@ -88,6 +91,10 @@ Fixes issue introduced in 2.2.1 with an incorrect function name (sorry about tha
 Better SEO by adding the ability to remove the "from" links - Thanks <a href="http://yoast.com/">Joost de Valk</a>
 
 == Changelog ==
+
+= 2.2.3 =
+* The Twitter-pocolypse hit a while back but since so many servers are 64 bit it wasn't an issue.  This fixes links for users on 32 bit servers.
+* Fix some notices thrown by translated strings
 
 = 2.2.2 =
 * Fix issue introduced in 2.2.1 with an incorrect function name '_hashtagLink' (sorry about that)
