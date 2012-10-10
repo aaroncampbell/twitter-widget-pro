@@ -1,21 +1,22 @@
 === Twitter Widget Pro ===
 Contributors: aaroncampbell
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_xclick&business=paypal%40xavisys%2ecom&item_name=Twitter%20Widget%20Pro&no_shipping=0&no_note=1&tax=0&currency_code=USD&lc=US&bn=PP%2dDonationsBF&charset=UTF%2d8
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9993090
 Tags: twitter, widget, feed
 Requires at least: 3.0
 Tested up to: 3.3.0
-Stable tag: 2.3.3
+Stable tag: 2.3.4
 
-A widget that properly handles twitter feeds, including parsing @username, #hashtags, and URLs into links. Requires PHP5.
+A widget that properly handles twitter feeds, including parsing @username, #hashtags, and URLs into links.
 
 == Description ==
 
 A widget that properly handles twitter feeds, including @username, #hashtag, and
 link parsing.  It supports displaying profiles images, and even lets you control
 whether to display the time and date of a tweet or how log ago it happened
-(about 5 hours ago, etc).  Requires PHP5.
+(about 5 hours ago, etc).
 
-Author: <a href="http://xavisys.com/" title="WordPress development">Aaron D. Campbell</a>
+<a href="http://bluedogwebservices.com/wordpress-plugin/twitter-widget-pro/">Twitter Widget Pro</a>
+Brought to you by <a href="http://bluedogwebservices.com/" title="WordPress Development">BlueDog Web Services</a>
 
 == Installation ==
 
@@ -131,6 +132,9 @@ Aparently the database queries required to display the friends feed was causing 
 
 == Upgrade Notice ==
 
+= 2.3.4 =
+Fixed the conflict with Jetpack!  Also a new Arabic translation
+
 = 2.3.3 =
 Fixed issue with updates getting stuck, and add data-lang support for Twitter intents
 
@@ -144,6 +148,10 @@ Fixes an issue with the intents and follow settings not being saved
 Fewer "could not connect to Twitter" messages, new links (reply, retweet, favorite), new follow button, and avatar fixes
 
 == Changelog ==
+
+= 2.3.4 =
+* Added an Arabic translation - Thanks Yaser Maadan - http://www.englize.com
+* Fix conflict with Jetpack by disabling their Twitter widget
 
 = 2.3.3 =
 * Updated TLC to fix issue where updates could get stuck "locked"
