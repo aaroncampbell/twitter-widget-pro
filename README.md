@@ -126,6 +126,7 @@ Aparently the database queries required to display the friends feed was causing 
 * Link FTP links
 * Link E-Mail addresses
 * Complete conversion to Range plugin framework from Xavisys framework
+* Added place to check API usage
 
 ### 2.3.11
 * Fix issue with "Include Retweets" not unchecking
