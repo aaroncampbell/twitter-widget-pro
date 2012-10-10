@@ -3,8 +3,8 @@ Contributors: aaroncampbell
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9993090
 Tags: twitter, widget, feed
 Requires at least: 3.0
-Tested up to: 3.3.0
-Stable tag: 2.3.4
+Tested up to: 3.3.1
+Stable tag: 2.3.5
 
 A widget that properly handles twitter feeds, including parsing @username, #hashtags, and URLs into links.
 
@@ -72,7 +72,7 @@ You can see these put into action by trying something like:
 
 = How can I style it to look nicer? =
 
-There are plenty of CSS classes throughout the HTML that is generated, and you can use those to style things.  Here is some sample CSS that I use with the <a href="essencetheme.com" title="Essence Theme for WordPress">Essence Theme</a>.  You'll need to get the "Everything" sprite from <a href="https://dev.twitter.com/docs/image-resources">Twitter's Image Resources</a>.
+There are plenty of CSS classes throughout the HTML that is generated, and you can use those to style things.  Here is some sample CSS that I use with the <a href="http://essencetheme.com" title="Essence Theme for WordPress">Essence Theme</a>.  You'll need to get the "Everything" sprite from <a href="https://dev.twitter.com/docs/image-resources">Twitter's Image Resources</a>.
 `
 .widget_twitter div {
 	padding:0;
@@ -132,6 +132,9 @@ Aparently the database queries required to display the friends feed was causing 
 
 == Upgrade Notice ==
 
+= 2.3.5 =
+Added HTTP & HTTPS API setting and fixed support forum links
+
 = 2.3.4 =
 Fixed the conflict with Jetpack!  Also a new Arabic translation
 
@@ -148,6 +151,11 @@ Fixes an issue with the intents and follow settings not being saved
 Fewer "could not connect to Twitter" messages, new links (reply, retweet, favorite), new follow button, and avatar fixes
 
 == Changelog ==
+
+= 2.3.5 =
+* Added a setting to allow using the Twtter API via HTTP or HTTPS
+* Fixed support forum links
+* Small alignment adjustment on settings page
 
 = 2.3.4 =
 * Added an Arabic translation - Thanks Yaser Maadan - http://www.englize.com
@@ -191,7 +199,7 @@ Fewer "could not connect to Twitter" messages, new links (reply, retweet, favori
 * Add the ability to remove the "from" links from displaying - Thanks to <a href="http://yoast.com/">Joost de Valk</a> for the request and the patch!
 
 = 2.2.0 =
-* Now uses the Xavisys WordPress Plugin Framework - http://xavisys.com/xavisys-wordpress-plugin-framework/
+* Now uses the Xavisys WordPress Plugin Framework - http://bluedogwebservices.com/xavisys-wordpress-plugin-framework/
 * Added an options page where you can set defaults that apply to widgets, shortcodes, and php calls (everything can be overridden)
 * Added the Xavisys feed to the dashboard (which can be hidden using the screen options)
 * Fixed problem for people with certain WP configs and PHP 5.0-5.1.x that caused the Services_JSON class to get included twice.
@@ -207,7 +215,7 @@ Fewer "could not connect to Twitter" messages, new links (reply, retweet, favori
 
 = 2.1.2 =
 * Fixed spacing issue that was introduced in 2.1.1
-* Added links to the <a href="http://xavisys.com/support/forum/twitter-widget-pro/">Support Forum</a>
+* Added links to the Support Forum
 
 = 2.1.1 =
 * Added an option to open links in new windows
