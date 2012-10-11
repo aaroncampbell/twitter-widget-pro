@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2;plural=n != 1;\n"
-"PO-Revision-Date: 2012-10-11 11:02+0100\n"
+"PO-Revision-Date: 2012-10-11 11:18+0100\n"
 "Last-Translator: \n"
 "Language-Team: Marko Heijnen <info@markoheijnen.com>\n"
 "X-Generator: Poedit 1.5.4\n"
@@ -194,13 +194,13 @@ msgstr "Twitter Widget"
 
 #: wp-twitter-widget.php:262
 msgid "There were no locks to clear!"
-msgstr "Er waren geen locks om op te schonen"
+msgstr "Er waren geen blokkeringen om op te schonen"
 
 #: wp-twitter-widget.php:264
 msgid "Successfully cleared %d lock."
 msgid_plural "Successfully cleared %d locks."
-msgstr[0] "Succesvol %d lock verwijderd."
-msgstr[1] "Succesvol %d locks verwijderd."
+msgstr[0] "Succesvol %d blokkering verwijderd."
+msgstr[1] "Succesvol %d blokkeringen verwijderd."
 
 #: wp-twitter-widget.php:270
 msgid "General Settings"
@@ -232,11 +232,11 @@ msgstr ""
 
 #: wp-twitter-widget.php:294
 msgid "Clear Update Locks:"
-msgstr "Schoon locks op:"
+msgstr "Schoon blokkeringen op:"
 
 #: wp-twitter-widget.php:297
 msgid "Clear Update Locks"
-msgstr "Schoon locks op"
+msgstr "Schoon blokkeringen op"
 
 #: wp-twitter-widget.php:298
 msgid ""
@@ -244,9 +244,9 @@ msgid ""
 "getting cleared.  If you're experiencing issues with your feed not updating, "
 "try clearing the update locks."
 msgstr ""
-"Een klein percentage van servers lijkt problemen te hebben met update lock "
-"niet continue word gewist. Als u problemen ondervindt met dat je feed niet "
-"update, probeer dan zelf de update locks te wissen."
+"Een klein percentage van servers lijkt problemen te hebben met een update "
+"blokkering die niet word gewist. Als u problemen ondervindt met dat je feed "
+"niet update, probeer dan zelf de update blokkeringen te wissen."
 
 #: wp-twitter-widget.php:303
 msgid "Current API Usage"
