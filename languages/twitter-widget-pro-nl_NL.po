@@ -182,7 +182,7 @@ msgstr ""
 
 #: wp-twitter-widget.php:142 wp-twitter-widget.php:446
 msgid "Open links in a new window"
-msgstr "Open links in een nieuwe venster"
+msgstr "Open links in een nieuw venster"
 
 #: wp-twitter-widget.php:146 wp-twitter-widget.php:449
 msgid "Show Link to Twitter Widget Pro"
