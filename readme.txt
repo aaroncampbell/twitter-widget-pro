@@ -3,7 +3,7 @@ Contributors: aaroncampbell, PeteMall, range, saracannon
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9993090
 Tags: twitter, widget, feed
 Requires at least: 3.0
-Tested up to: 3.4.2
+Tested up to: 3.5
 Stable tag: 2.4.0
 
 A widget that properly handles twitter feeds, including parsing @username, #hashtags, and URLs into links.
