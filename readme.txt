@@ -130,6 +130,9 @@ Aparently the database queries required to display the friends feed was causing 
 
 == Upgrade Notice ==
 
+= 2.4.1 =
+Better support for hashtags with international characters
+
 = 2.4.0 =
 Better linking to fix issues with links followed by punctuation plus support for extended characters in hashtags
 
@@ -170,6 +173,9 @@ Fixes an issue with the intents and follow settings not being saved
 Fewer "could not connect to Twitter" messages, new links (reply, retweet, favorite), new follow button, and avatar fixes
 
 == Changelog ==
+
+= 2.4.1 =
+* Make sure hashtags are parsed UTF-8
 
 = 2.4.0 =
 * Better linking of URLs, especially handling of punctuation at end of URLs

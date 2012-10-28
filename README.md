@@ -118,6 +118,9 @@ Aparently the database queries required to display the friends feed was causing 
 
 ## Changelog
 
+### 2.4.1
+* Make sure hashtags are parsed UTF-8
+
 ### 2.4.0
 * Better linking of URLs, especially handling of punctuation at end of URLs
 * Support for extended characters in hashtags
