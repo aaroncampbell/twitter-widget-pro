@@ -3,7 +3,7 @@
  * Plugin Name: Twitter Widget Pro
  * Plugin URI: http://bluedogwebservices.com/wordpress-plugin/twitter-widget-pro/
  * Description: A widget that properly handles twitter feeds, including @username, #hashtag, and link parsing.  It can even display profile images for the users.  Requires PHP5.
- * Version: 2.4.0-beta
+ * Version: 2.4.1
  * Author: Aaron D. Campbell
  * Author URI: http://ran.ge/
  * License: GPLv2 or later
@@ -134,7 +134,7 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				</select>
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'dateFormat' ); ?>"><?php echo sprintf( __( 'Format to dispaly the date in, uses <a href="%s">PHP date()</a> format:', $this->_slug ), 'http://php.net/date' ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'dateFormat' ); ?>"><?php echo sprintf( __( 'Format to display the date in, uses <a href="%s">PHP date()</a> format:', $this->_slug ), 'http://php.net/date' ); ?></label>
 				<input class="widefat" id="<?php echo $this->get_field_id( 'dateFormat' ); ?>" name="<?php echo $this->get_field_name( 'dateFormat' ); ?>" type="text" value="<?php esc_attr_e( $instance['dateFormat'] ); ?>" />
 			</p>
 			<p>
@@ -277,7 +277,7 @@ class wpTwitterWidget extends RangePlugin {
 				<table class="form-table">
 					<tr valign="top">
 						<th scope="row">
-							<?php _e( "HTTP vs HTTPS:", $this->_slug );?>
+							<?php _e( "HTTP vs HTTPS", $this->_slug );?>
 						</th>
 						<td>
 							<input class="checkbox" type="radio" value="https" id="twp_http_vs_https_https" name="twp[http_vs_https]"<?php checked( $this->_settings['twp']['http_vs_https'], 'https' ); ?> />
@@ -291,11 +291,11 @@ class wpTwitterWidget extends RangePlugin {
 					</tr>
 					<tr>
 						<th scope="row">
-							<?php _e( "Clear Update Locks:", $this->_slug );?>
+							<?php _e( "Clear Update Locks", $this->_slug );?>
 						</th>
 						<td>
 							<a href="<?php echo esc_url( $clear_locks_url ); ?>"><?php _e( 'Clear Update Locks', $this->_slug ); ?></a><br />
-							<small><?php _e( "A small perecntage of servers seem to have issues where an update lock isn't getting cleared.  If you're experiencing issues with your feed not updating, try clearing the update locks.", $this->_slug ); ?></small>
+							<small><?php _e( "A small percentage of servers seem to have issues where an update lock isn't getting cleared.  If you're experiencing issues with your feed not updating, try clearing the update locks.", $this->_slug ); ?></small>
 						</td>
 					</tr>
 					<tr>
@@ -413,7 +413,7 @@ class wpTwitterWidget extends RangePlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_dateFormat"><?php echo sprintf( __( 'Format to dispaly the date in, uses <a href="%s">PHP date()</a> format:', $this->_slug ), 'http://php.net/date' ); ?></label>
+							<label for="twp_dateFormat"><?php echo sprintf( __( 'Format to display the date in, uses <a href="%s">PHP date()</a> format:', $this->_slug ), 'http://php.net/date' ); ?></label>
 						</th>
 						<td>
 							<input id="twp_dateFormat" name="twp[dateFormat]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['dateFormat'] ); ?>" size="40" />
@@ -479,7 +479,7 @@ class wpTwitterWidget extends RangePlugin {
 	 * @return string - Tweet text with #hashtags linked
 	 */
 	public function linkHashtags( $text ) {
-		$text = preg_replace_callback('/(^|\s)(#[\w\x{00C0}-\x{00D6}\x{00D8}-\x{00F6}\x{00F8}-\x{00FF}]*)/i', array($this, '_linkHashtagsCallback'), $text);
+		$text = preg_replace_callback('/(^|\s)(#[\w\x{00C0}-\x{00D6}\x{00D8}-\x{00F6}\x{00F8}-\x{00FF}]+)/iu', array($this, '_linkHashtagsCallback'), $text);
 		return $text;
 	}
 
