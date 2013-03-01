@@ -109,6 +109,9 @@ class wpTwitter {
 				$resp = wp_remote_request($request_url, array( 'method'=>$method, 'body'=>$parameters));
 		}
 
+		if ( 'account/verify_credentials' == $method )
+			dump( $resp, '$resp' );
+
 		if ( !is_wp_error( $resp ) && $resp['response']['code'] >= 200 && $resp['response']['code'] < 300 ) {
 			$decoded_response = json_decode( $resp['body'] );
 			if ( empty( $decoded_response ) && ! empty( $resp['body'] ) )

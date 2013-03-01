@@ -61,11 +61,41 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 	public function form( $instance ) {
 		$instance = $this->_getInstanceSettings( $instance );
 		$wpTwitterWidget = wpTwitterWidget::getInstance();
+		$users = $wpTwitterWidget->get_users_list( true );
+
 ?>
 			<p>
 				<label for="<?php echo $this->get_field_id( 'username' ); ?>"><?php _e( 'Twitter username:', $this->_slug ); ?></label>
-				<input class="widefat" id="<?php echo $this->get_field_id( 'username' ); ?>" name="<?php echo $this->get_field_name( 'username' ); ?>" type="text" value="<?php esc_attr_e( $instance['username'] ); ?>" />
+				<select id="<?php echo $this->get_field_id( 'username' ); ?>" name="<?php echo $this->get_field_name( 'username' ); ?>">
+					<option></option>
+					<?php
+					$selected = false;
+					foreach ( $users as $u ) {
+						?>
+						<option value="<?php echo esc_attr( strtolower( $u['screen_name'] ) ); ?>"<?php $s = selected( strtolower( $u['screen_name'] ), strtolower( $instance['username'] ) ) ?>><?php echo esc_html( $u['screen_name'] ); ?></option>
+						<?php
+						if ( ! empty( $s ) )
+							$selected = true;
+					}
+					?>
+				</select>
 			</p>
+			<?php
+			if ( ! $selected && ! empty( $instance['username'] ) ) {
+				$query_args = array(
+					'action' => 'authorize',
+					'screen_name' => $instance['username'],
+				);
+				$authorize_user_url = wp_nonce_url( add_query_arg( $query_args, $wpTwitterWidget->get_options_url() ), 'authorize' );
+				?>
+			<p>
+				<a href="<?php echo esc_url( $authorize_user_url ); ?>" style="color:red;">
+					<?php _e( 'You need to authorize this account.', $this->_slug ); ?>
+				</a>
+			</p>
+				<?php
+			}
+			?>
 			<p>
 				<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Give the feed a title ( optional ):', $this->_slug ); ?></label>
 				<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php esc_attr_e( $instance['title'] ); ?>" />
@@ -1138,6 +1168,19 @@ class wpTwitterWidget extends RangePlugin {
 
 	public function getSettings( $settings ) {
 		return $this->fixAvatar( wp_parse_args( $settings, $this->_settings['twp'] ) );
+	}
+
+	public function get_users_list( $authed = false ) {
+		$users = $this->_settings['twp-authed-users'];
+		if ( $authed ) {
+			foreach ( $users as $key => $u ) {
+				$this->_wp_twitter_oauth->set_token( $u );
+				$rates = $this->_wp_twitter_oauth->send_authed_request( 'application/rate_limit_status', 'GET', array( 'resources' => 'statuses,lists' ) );
+				if ( is_wp_error( $rates ) )
+					unset( $users[$key] );
+			}
+		}
+		return $users;
 	}
 }
 // Instantiate our class
