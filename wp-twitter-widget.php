@@ -62,6 +62,7 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 		$instance = $this->_getInstanceSettings( $instance );
 		$wpTwitterWidget = wpTwitterWidget::getInstance();
 		$users = $wpTwitterWidget->get_users_list( true );
+		$lists = $wpTwitterWidget->get_lists();
 
 ?>
 			<p>
@@ -76,6 +77,23 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 						<?php
 						if ( ! empty( $s ) )
 							$selected = true;
+					}
+					?>
+				</select>
+			</p>
+			<p>
+				<label for="<?php echo $this->get_field_id( 'list' ); ?>"><?php _e( 'Twitter list:', $this->_slug ); ?></label>
+				<select id="<?php echo $this->get_field_id( 'list' ); ?>" name="<?php echo $this->get_field_name( 'list' ); ?>">
+					<option></option>
+					<?php
+					foreach ( $lists as $user => $user_lists ) {
+						echo '<optgroup label="' . esc_attr( $user ) . '">';
+						foreach ( $user_lists as $list_id => $list_name ) {
+							?>
+							<option value="<?php echo esc_attr( $user . '::' . $list_id ); ?>"<?php $s = selected( $user . '::' . $list_id, strtolower( $instance['list'] ) ) ?>><?php echo esc_html( $list_name ); ?></option>
+							<?php
+						}
+						echo '</optgroup>';
 					}
 					?>
 				</select>
@@ -317,6 +335,7 @@ class wpTwitterWidget extends RangePlugin {
 				wp_safe_redirect( add_query_arg( $redirect_args, $this->get_options_url() ) );
 
 			$this->_wp_twitter_oauth->set_token( get_option( '_twp_request_token_'.$_GET['nonce'] ) );
+			delete_option( '_twp_request_token_'.$_GET['nonce'] );
 
 			$token = $this->_wp_twitter_oauth->get_access_token( $_GET['oauth_verifier'] );
 			$this->_settings['twp-authed-users'][strtolower($token['screen_name'])] = $token;
@@ -391,11 +410,11 @@ class wpTwitterWidget extends RangePlugin {
 					<?php
 					$rates = $this->_wp_twitter_oauth->send_authed_request( 'application/rate_limit_status', 'GET', array( 'resources' => 'statuses,lists' ) );
 					if ( ! is_wp_error( $rates ) ) {
-						$rates = array(
+						$display_rates = array(
 							__( 'Lists', $this->_slug ) => $rates->resources->lists->{'/lists/statuses'},
 							__( 'Statuses', $this->_slug ) => $rates->resources->statuses->{'/statuses/user_timeline'},
 						);
-						foreach ( $rates as $title => $rate ) {
+						foreach ( $display_rates as $title => $rate ) {
 						?>
 						<td>
 							<strong><?php echo esc_html( $title ); ?></strong>
@@ -759,7 +778,7 @@ class wpTwitterWidget extends RangePlugin {
 		$widgetContent = $args['before_widget'] . '<div>';
 
 		if ( empty( $args['title'] ) )
-			$args['title'] = "Twitter: {$args['username']}";
+			$args['title'] = sprintf( __( 'Twitter: %s', $this->_slug ), $args['username'] );
 
 		$args['title'] = apply_filters( 'twitter-widget-title', $args['title'], $args );
 		$args['title'] = "<span class='twitterwidget twitterwidget-title'>{$args['title']}</span>";
@@ -837,7 +856,7 @@ class wpTwitterWidget extends RangePlugin {
 		}
 
 		$widgetContent .= '</ul>';
-		if ( 'true' == $args['showfollow'] ) {
+		if ( 'true' == $args['showfollow'] && ! empty( $args['username'] ) ) {
 			$widgetContent .= '<div class="follow-button">';
 			$linkText = "@{$args['username']}";
 			$linkAttrs = array(
@@ -923,17 +942,27 @@ class wpTwitterWidget extends RangePlugin {
 	 */
 	public function parseFeed( $widgetOptions ) {
 		$parameters = $this->_get_feed_request_settings( $widgetOptions );
+		$response = array();
 
-		if ( empty( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] ) ) {
-			if ( empty( $widgetOptions['errmsg'] ) )
-				$widgetOptions['errmsg'] = __( 'Account needs to be authorized', $this->_slug );
-			$response = array();
-		} else {
-			$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] );
+		if ( ! empty( $parameters['screen_name'] ) ) {
+			if ( empty( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] ) ) {
+				if ( empty( $widgetOptions['errmsg'] ) )
+					$widgetOptions['errmsg'] = __( 'Account needs to be authorized', $this->_slug );
+			} else {
+				$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] );
+				$response = $this->_wp_twitter_oauth->send_authed_request( 'statuses/user_timeline', 'GET', $parameters );
+				if ( ! is_wp_error( $response ) )
+					return $response;
+			}
+		} elseif ( ! empty( $parameters['list_id'] ) ) {
+			$user = array_shift( explode( '::', $widgetOptions['list'] ) );
+			$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][strtolower( $user )] );
+
 			$response = $this->_wp_twitter_oauth->send_authed_request( 'statuses/user_timeline', 'GET', $parameters );
 			if ( ! is_wp_error( $response ) )
 				return $response;
 		}
+
 		if ( empty( $widgetOptions['errmsg'] ) )
 			$widgetOptions['errmsg'] = __( 'Invalid Twitter Response.', $this->_slug );
 		do_action( 'widget_twitter_parsefeed_error', $response, $parameters, $widgetOptions );
@@ -962,9 +991,13 @@ class wpTwitterWidget extends RangePlugin {
 		 */
 
 		$parameters = array(
-			'screen_name' => $widgetOptions['username'],
 			'count'       => $widgetOptions['items'],
 		);
+
+		if ( ! empty( $widgetOptions['username'] ) )
+			$parameters['screen_name'] = $widgetOptions['username'];
+		elseif ( ! empty( $widgetOptions['list'] ) )
+			$parameters['list_id'] = array_pop( explode( '::', $widgetOptions['list'] ) );
 
 		if ( 'true' == $widgetOptions['hidereplies'] )
 			$parameters['exclude_replies'] = 'true';
@@ -1137,6 +1170,7 @@ class wpTwitterWidget extends RangePlugin {
 			'errmsg'          => '',
 			'fetchTimeOut'    => '2',
 			'username'        => '',
+			'list'            => '',
 			'http_vs_https'   => 'https',
 			'hidereplies'     => 'false',
 			'showretweets'    => 'true',
@@ -1174,14 +1208,35 @@ class wpTwitterWidget extends RangePlugin {
 	public function get_users_list( $authed = false ) {
 		$users = $this->_settings['twp-authed-users'];
 		if ( $authed ) {
+			if ( ! empty( $this->_authed_users ) )
+				return $this->_authed_users;
 			foreach ( $users as $key => $u ) {
 				$this->_wp_twitter_oauth->set_token( $u );
 				$rates = $this->_wp_twitter_oauth->send_authed_request( 'application/rate_limit_status', 'GET', array( 'resources' => 'statuses,lists' ) );
 				if ( is_wp_error( $rates ) )
 					unset( $users[$key] );
 			}
+			$this->_authed_users = $users;
 		}
 		return $users;
+	}
+
+	public function get_lists() {
+		if ( ! empty( $this->_lists ) )
+			return $this->_lists;
+		$this->_lists =  array();
+		foreach ( $this->_settings['twp-authed-users'] as $key => $u ) {
+			$this->_wp_twitter_oauth->set_token( $u );
+			$user_lists = $this->_wp_twitter_oauth->send_authed_request( 'lists/list', 'GET', array( 'resources' => 'statuses,lists' ) );
+
+			if ( ! empty( $user_lists ) && ! is_wp_error( $user_lists ) ) {
+				$this->_lists[$key] = array();
+				foreach ( $user_lists as $l ) {
+					$this->_lists[$key][$l->id] = $l->name;
+				}
+			}
+		}
+		return $this->_lists;
 	}
 }
 // Instantiate our class
