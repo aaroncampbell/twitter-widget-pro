@@ -131,7 +131,7 @@ Aparently the database queries required to display the friends feed was causing 
 == Upgrade Notice ==
 
 = 2.5.0 =
-Upgrade to the new Twitter API
+Upgrade to the new Twitter API and add support for lists
 
 = 2.4.1 =
 Better support for hashtags with international characters & new German translation
@@ -179,6 +179,7 @@ Fewer "could not connect to Twitter" messages, new links (reply, retweet, favori
 
 = 2.5.0 =
 * Use the new Twitter API with oAuth
+* Adds support for lists
 * No longer supports non-https Twitter requests (Twitter API requirement)
 
 = 2.4.1 =
