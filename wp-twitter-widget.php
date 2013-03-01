@@ -1035,7 +1035,8 @@ class wpTwitterWidget extends RangePlugin {
 			'href'  => "http://twitter.com/{$user->screen_name}",
 			'title' => $user->name
 		);
-		$img = str_replace( '_normal.', "_{$args['avatar']}.", $user->profile_image_url_https );
+		$replace = ( 'original' == $args['avatar'] )? '':"_{$args['avatar']}.";
+		$img = str_replace( '_normal.', $replace, $user->profile_image_url_https );
 
 		return $this->_buildLink( "<img alt='{$user->name}' src='{$img}' />", $linkAttrs, true );
 	}
