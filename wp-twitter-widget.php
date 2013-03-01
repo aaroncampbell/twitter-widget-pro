@@ -191,18 +191,25 @@ class wpTwitterWidget extends RangePlugin {
 	private $_api_url;
 
 	/**
+	 * @var wpTwitter
+	 */
+	private $_wp_twitter_oauth;
+
+	/**
 	 * @var wpTwitterWidget - Static property to hold our singleton instance
 	 */
 	static $instance = false;
 
 	protected function _init() {
+		require_once( 'lib/wp-twitter.php' );
+
 		$this->_hook = 'twitterWidgetPro';
 		$this->_file = plugin_basename( __FILE__ );
 		$this->_pageTitle = __( 'Twitter Widget Pro', $this->_slug );
 		$this->_menuTitle = __( 'Twitter Widget', $this->_slug );
 		$this->_accessLevel = 'manage_options';
 		$this->_optionGroup = 'twp-options';
-		$this->_optionNames = array( 'twp' );
+		$this->_optionNames = array( 'twp', 'twp-authed-users', 'twp_version' );
 		$this->_optionCallbacks = array();
 		$this->_slug = 'twitter-widget-pro';
 		$this->_paypalButtonId = '9993090';
@@ -218,6 +225,7 @@ class wpTwitterWidget extends RangePlugin {
 		add_filter( 'widget_twitter_content', array( $this, 'linkHashtags' ) );
 		add_filter( 'widget_twitter_content', 'convert_chars' );
 		add_filter( $this->_slug .'-opt-twp', array( $this, 'filterSettings' ) );
+		add_filter( $this->_slug .'-opt-twp-authed-users', array( $this, 'authed_users_option' ) );
 		add_shortcode( 'twitter-widget', array( $this, 'handleShortcodes' ) );
 
 		$twp_version = get_option( 'twp_version' );
@@ -226,9 +234,13 @@ class wpTwitterWidget extends RangePlugin {
 	}
 
 	protected function _post_settings_init() {
-		if ( ! in_array( $this->_settings['twp']['http_vs_https'], array( 'http', 'https' ) ) )
-			$this->_settings['twp']['http_vs_https'] = 'https';
-		$this->_api_url = $this->_settings['twp']['http_vs_https'] . '://api.twitter.com/1/';
+		$oauth_settings = array(
+			'consumer-key'    => $this->_settings['twp']['consumer-key'],
+			'consumer-secret' => $this->_settings['twp']['consumer-secret'],
+		);
+		$this->_wp_twitter_oauth = new wpTwitter( $oauth_settings );
+
+		$this->_api_url = 'https://api.twitter.com/1.1/';
 	}
 
 	/**
@@ -258,39 +270,160 @@ class wpTwitterWidget extends RangePlugin {
 			wp_safe_redirect( add_query_arg( $redirect_args, remove_query_arg( array( 'action', '_wpnonce' ) ) ) );
 			exit;
 		}
+
+		if ( 'authorize' == $_GET['action'] ) {
+			check_admin_referer( 'authorize' );
+			$auth_redirect = add_query_arg( array( 'action' => 'authorized' ), $this->get_options_url() );
+			$token = $this->_wp_twitter_oauth->getRequestToken( $auth_redirect );
+			if ( is_wp_error( $token ) )
+				return;
+			update_option( '_twp_request_token_'.$token['nonce'], $token );
+			$screen_name = empty( $_GET['screen_name'] )? '':$_GET['screen_name'];
+			wp_redirect( $this->_wp_twitter_oauth->get_authorize_url( $screen_name ) );
+			exit;
+		}
+		if ( 'authorized' == $_GET['action'] ) {
+			$redirect_args = array(
+				'message'    => strtolower( $_GET['action'] ),
+				'authorized' => '',
+			);
+			if ( empty( $_GET['oauth_verifier'] ) || empty( $_GET['nonce'] ) )
+				wp_safe_redirect( add_query_arg( $redirect_args, $this->get_options_url() ) );
+
+			$this->_wp_twitter_oauth->set_token( get_option( '_twp_request_token_'.$_GET['nonce'] ) );
+
+			$token = $this->_wp_twitter_oauth->get_access_token( $_GET['oauth_verifier'] );
+			$this->_settings['twp-authed-users'][strtolower($token['screen_name'])] = $token;
+			update_option( 'twp-authed-users', $this->_settings['twp-authed-users'] );
+
+			$redirect_args['authorized'] = $token['screen_name'];
+			wp_safe_redirect( add_query_arg( $redirect_args, $this->get_options_url() ) );
+			exit;
+		}
 	}
 
 	public function show_messages() {
-		if ( ! empty( $_GET['message'] ) && 'clear-locks' == $_GET['message'] ) {
-			if ( empty( $_GET['locks_cleared'] ) || 0 == $_GET['locks_cleared'] )
-				$msg = __( 'There were no locks to clear!', $this->_slug );
-			else
-				$msg = sprintf( _n( 'Successfully cleared %d lock.', 'Successfully cleared %d locks.', $_GET['locks_cleared'], $this->_slug ), $_GET['locks_cleared'] );
-			echo "<div class='updated'>" . esc_html( $msg ) . '</div>';
+		if ( ! empty( $_GET['message'] ) ) {
+			if ( 'clear-locks' == $_GET['message'] ) {
+				if ( empty( $_GET['locks_cleared'] ) || 0 == $_GET['locks_cleared'] )
+					$msg = __( 'There were no locks to clear!', $this->_slug );
+				else
+					$msg = sprintf( _n( 'Successfully cleared %d lock.', 'Successfully cleared %d locks.', $_GET['locks_cleared'], $this->_slug ), $_GET['locks_cleared'] );
+			} elseif ( 'authorized' == $_GET['message'] ) {
+				if ( ! empty( $_GET['authorized'] ) )
+					$msg = sprintf( __( 'Successfully authorized @%s', $this->_slug ), $_GET['authorized'] );
+				else
+					$msg = __( 'There was a problem authorizing your account.', $this->_slug );
+			}
+			echo "<div class='updated'><p>" . esc_html( $msg ) . '</p></div>';
 		}
 	}
 
 	public function add_options_meta_boxes() {
+		add_meta_box( $this->_slug . '-oauth', __( 'Authenticated Twitter Accounts', $this->_slug ), array( $this, 'oauth_meta_box' ), 'range-' . $this->_slug, 'main' );
 		add_meta_box( $this->_slug . '-general-settings', __( 'General Settings', $this->_slug ), array( $this, 'general_settings_meta_box' ), 'range-' . $this->_slug, 'main' );
 		add_meta_box( $this->_slug . '-defaults', __( 'Default Settings for Shortcodes', $this->_slug ), array( $this, 'default_settings_meta_box' ), 'range-' . $this->_slug, 'main' );
 	}
 
+	public function oauth_meta_box() {
+		$authorize_url = wp_nonce_url( add_query_arg( array( 'action' => 'authorize' ) ), 'authorize' );
+
+		?>
+		<table class="widefat">
+			<thead>
+				<tr valign="top">
+					<th scope="row">
+						<?php _e( 'Username', $this->_slug );?>
+					</th>
+					<th scope="row">
+						<?php _e( 'Lists Rate Usage', $this->_slug );?>
+					</th>
+					<th scope="row">
+						<?php _e( 'Statuses Rate Usage', $this->_slug );?>
+					</th>
+				</tr>
+			</thead>
+		<?php
+		foreach ( $this->_settings['twp-authed-users'] as $u ) {
+			$this->_wp_twitter_oauth->set_token( $u );
+			$user_info = $this->_wp_twitter_oauth->send_authed_request( 'account/verify_credentials', 'GET' );
+			$style = $auth_link = '';
+			if ( is_wp_error( $user_info ) ) {
+				$query_args = array(
+					'action' => 'authorize',
+					'screen_name' => $u['screen_name'],
+				);
+				$authorize_user_url = wp_nonce_url( add_query_arg( $query_args ), 'authorize' );
+				$style = 'color:red;';
+				$auth_link = ' - <a href="' . esc_url( $authorize_user_url ) . '">' . __( 'Reauthorize', $this->_slug ) . '</a>';
+			}
+			?>
+				<tr valign="top">
+					<th scope="row" style="<?php echo esc_attr( $style ); ?>">
+						<strong>@<?php echo esc_html( $u['screen_name'] ) . $auth_link; ?></strong>
+					</th>
+					<?php
+					$rates = $this->_wp_twitter_oauth->send_authed_request( 'application/rate_limit_status', 'GET', array( 'resources' => 'statuses,lists' ) );
+					if ( ! is_wp_error( $rates ) ) {
+						$rates = array(
+							__( 'Lists', $this->_slug ) => $rates->resources->lists->{'/lists/statuses'},
+							__( 'Statuses', $this->_slug ) => $rates->resources->statuses->{'/statuses/user_timeline'},
+						);
+						foreach ( $rates as $title => $rate ) {
+						?>
+						<td>
+							<strong><?php echo esc_html( $title ); ?></strong>
+							<p>
+								<?php echo sprintf( __( 'Used: %d', $this->_slug ), $rate->limit - $rate->remaining ); ?><br />
+								<?php echo sprintf( __( 'Remaining: %d', $this->_slug ), $rate->remaining ); ?><br />
+								<?php
+								$minutes = ceil( ( $rate->reset - gmdate( 'U' ) ) / 60 );
+								echo sprintf( _n( 'Limits reset in: %d minutes', 'Limits reset in: %d minutes', $minutes, $this->_slug ), $minutes );
+								?><br />
+								<small><?php _e( 'This is overall usage, not just usage from Twitter Widget Pro', $this->_slug ); ?></small>
+							</p>
+						</td>
+						<?php
+						}
+					} else {
+						?>
+						<td>
+							<p><?php _e( 'There was an error checking your rate limit.', $this->_slug ); ?></p>
+						</td>
+						<td>
+							<p><?php _e( 'There was an error checking your rate limit.', $this->_slug ); ?></p>
+						</td>
+						<?php
+					}
+					?>
+				</tr>
+				<?php
+			}
+		?>
+		</table>
+		<p>
+			<a href="<?php echo esc_url( $authorize_url );?>" class="button button-large button-primary"><?php _e( 'Authorize New Account', $this->_slug ); ?></a>
+		</p>
+		<?php
+	}
 	public function general_settings_meta_box() {
 		$clear_locks_url = wp_nonce_url( add_query_arg( array( 'action' => 'clear-locks' ) ), 'clear-locks' );
 		?>
 				<table class="form-table">
 					<tr valign="top">
 						<th scope="row">
-							<?php _e( "HTTP vs HTTPS", $this->_slug );?>
+							<label for="twp_consumer_key"><?php _e( 'Consumer key', $this->_slug );?></label>
 						</th>
 						<td>
-							<input class="checkbox" type="radio" value="https" id="twp_http_vs_https_https" name="twp[http_vs_https]"<?php checked( $this->_settings['twp']['http_vs_https'], 'https' ); ?> />
-							<label for="twp_http_vs_https_https"><?php _e( 'Use Twitter API via HTTPS', $this->_slug ); ?></label>
-							<br />
-							<input class="checkbox" type="radio" value="http" id="twp_http_vs_https_http" name="twp[http_vs_https]"<?php checked( $this->_settings['twp']['http_vs_https'], 'http' ); ?> />
-							<label for="twp_http_vs_https_http"><?php _e( 'Use Twitter API via HTTP', $this->_slug ); ?></label>
-							<br />
-							<small><?php _e( "Some servers seem to have issues connecting via HTTPS.  If you're experiencing issues with your feed not updating, try setting this to HTTP.", $this->_slug ); ?></small>
+							<input id="twp_consumer_key" name="twp[consumer-key]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['consumer-key'] ); ?>" size="40" />
+						</td>
+					</tr>
+					<tr valign="top">
+						<th scope="row">
+							<label for="twp_consumer_secret"><?php _e( 'Consumer secret', $this->_slug );?></label>
+						</th>
+						<td>
+							<input id="twp_consumer_secret" name="twp[consumer-secret]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['consumer-secret'] ); ?>" size="40" />
 						</td>
 					</tr>
 					<tr>
@@ -300,36 +433,6 @@ class wpTwitterWidget extends RangePlugin {
 						<td>
 							<a href="<?php echo esc_url( $clear_locks_url ); ?>"><?php _e( 'Clear Update Locks', $this->_slug ); ?></a><br />
 							<small><?php _e( "A small percentage of servers seem to have issues where an update lock isn't getting cleared.  If you're experiencing issues with your feed not updating, try clearing the update locks.", $this->_slug ); ?></small>
-						</td>
-					</tr>
-					<tr>
-						<th scope="row">
-							<?php _e( 'Current API Usage', $this->_slug );?>
-						</th>
-						<td>
-							<?php
-							$limit_url = $this->_api_url . "account/rate_limit_status.json";
-							$resp = wp_remote_request( $limit_url );
-
-							if ( !is_wp_error( $resp ) && $resp['response']['code'] >= 200 && $resp['response']['code'] < 300 ) {
-								$decodedResponse = json_decode( $resp['body'] );
-								?>
-								<p>
-									<?php echo sprintf( __( 'Used: %d', $this->_slug ), $decodedResponse->hourly_limit - $decodedResponse->remaining_hits ); ?><br />
-									<?php echo sprintf( __( 'Remaining: %d', $this->_slug ), $decodedResponse->remaining_hits ); ?><br />
-									<?php
-									$minutes = ceil( ( $decodedResponse->reset_time_in_seconds - gmdate( 'U' ) ) / 60 );
-									echo sprintf( _n( 'Limits reset in: %d minutes', 'Limits reset in: %d minutes', $minutes, $this->_slug ), $minutes );
-									?><br />
-									<small><?php _e( 'This is overall usage, not just usage from Twitter Widget Pro', $this->_slug ); ?></small>
-								</p>
-								<?php
-							} else {
-								?>
-								<p><?php _e( 'There was an error checking your rate limit.', $this->_slug ); ?></p>
-								<?php
-							}
-							?>
 						</td>
 					</tr>
 				</table>
@@ -778,9 +881,10 @@ class wpTwitterWidget extends RangePlugin {
 	 * @return array - Array of objects
 	 */
 	private function _getTweets( $widgetOptions ) {
-		$key = 'twp_' . md5( $this->_getFeedUrl( $widgetOptions ) );
+		$key = 'twp_' . md5( maybe_serialize( $this->_get_feed_request_settings( $widgetOptions ) ) );
 		return tlc_transient( $key )
 			->expires_in( 300 ) // cache for 5 minutes
+			->extend_on_fail( 120 ) // On a failed call, don't try again for 2 minutes
 			->updates_with( array( $this, 'parseFeed' ), array( $widgetOptions ) )
 			->get();
 	}
@@ -792,43 +896,31 @@ class wpTwitterWidget extends RangePlugin {
 	 * @return array
 	 */
 	public function parseFeed( $widgetOptions ) {
-		$feedUrl = $this->_getFeedUrl( $widgetOptions );
-		$resp = wp_remote_request( $feedUrl, array( 'timeout' => $widgetOptions['fetchTimeOut'] ) );
+		$parameters = $this->_get_feed_request_settings( $widgetOptions );
 
-		if ( !is_wp_error( $resp ) && $resp['response']['code'] >= 200 && $resp['response']['code'] < 300 ) {
-			$decodedResponse = json_decode( $resp['body'] );
-			if ( empty( $decodedResponse ) || ! is_array( $decodedResponse ) ) {
-				if ( empty( $widgetOptions['errmsg'] ) )
-					$widgetOptions['errmsg'] = __( 'Invalid Twitter Response.', $this->_slug );
-			} elseif( !empty( $decodedResponse->error ) ) {
-				if ( empty( $widgetOptions['errmsg'] ) )
-					$widgetOptions['errmsg'] = $decodedResponse->error;
-			} else {
-				return $decodedResponse;
-			}
-		} else {
-			// Failed to fetch url;
+		if ( empty( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] ) ) {
 			if ( empty( $widgetOptions['errmsg'] ) )
-				$widgetOptions['errmsg'] = __( 'Could not connect to Twitter', $this->_slug );
+				$widgetOptions['errmsg'] = __( 'Account needs to be authorized', $this->_slug );
+			$response = array();
+		} else {
+			$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] );
+			$response = $this->_wp_twitter_oauth->send_authed_request( 'statuses/user_timeline', 'GET', $parameters );
+			if ( ! is_wp_error( $response ) )
+				return $response;
 		}
-		do_action( 'widget_twitter_parsefeed_error', $resp, $feedUrl, $widgetOptions );
+		if ( empty( $widgetOptions['errmsg'] ) )
+			$widgetOptions['errmsg'] = __( 'Invalid Twitter Response.', $this->_slug );
+		do_action( 'widget_twitter_parsefeed_error', $response, $parameters, $widgetOptions );
 		throw new Exception( $widgetOptions['errmsg'] );
 	}
 
 	/**
-	 * Gets the URL for the desired feed.
+	 * Gets the parameters for the desired feed.
 	 *
 	 * @param array $widgetOptions - settings needed such as username, feet type, etc
-	 * @param string[optional] $type - 'rss' or 'json'
-	 * @param bool[optional] $count - If true, it adds the count parameter to the URL
-	 * @return string - Twitter feed URL
+	 * @return array - Parameters ready to pass to a Twitter request
 	 */
-	private function _getFeedUrl( $widgetOptions, $type = 'json', $count = true ) {
-		if ( !in_array( $type, array( 'rss', 'json' ) ) )
-			$type = 'json';
-
-		$req = $this->_api_url . "statuses/user_timeline.{$type}";
-
+	private function _get_feed_request_settings( $widgetOptions ) {
 		/**
 		 * user_id
 		 * screen_name *
@@ -843,17 +935,19 @@ class wpTwitterWidget extends RangePlugin {
 		 * contributor_details
 		 */
 
-		$req = add_query_arg( array( 'screen_name' => $widgetOptions['username'] ), $req );
-		if ( $count )
-			$req = add_query_arg( array( 'count' => $widgetOptions['items'] ), $req );
+		$parameters = array(
+			'screen_name' => $widgetOptions['username'],
+			'count'       => $widgetOptions['items'],
+		);
 
 		if ( 'true' == $widgetOptions['hidereplies'] )
-			$req = add_query_arg( array( 'exclude_replies' => 'true' ), $req );
+			$parameters['exclude_replies'] = 'true';
 
 		if ( 'true' == $widgetOptions['showretweets'] )
-			$req = add_query_arg( array( 'include_rts' => 'true' ), $req );
+			$parameters['include_rts'] = 'true';
 
-		return $req;
+		return $parameters;
+
 	}
 
 	/**
@@ -915,9 +1009,7 @@ class wpTwitterWidget extends RangePlugin {
 			'href'  => "http://twitter.com/{$user->screen_name}",
 			'title' => $user->name
 		);
-		$img = $this->_api_url . 'users/profile_image';
-		$img = add_query_arg( array( 'screen_name' => $user->screen_name ), $img );
-		$img = add_query_arg( array( 'size' => $args['avatar'] ), $img );
+		$img = str_replace( '_normal.', "_{$args['avatar']}.", $user->profile_image_url_https );
 
 		return $this->_buildLink( "<img alt='{$user->name}' src='{$img}' />", $linkAttrs, true );
 	}
@@ -1004,6 +1096,12 @@ class wpTwitterWidget extends RangePlugin {
 			$attr['targetBlank'] = 'true';
 
 		return $this->display( $attr );
+	}
+
+	public function authed_users_option( $settings ) {
+		if ( ! is_array( $settings ) )
+			return array();
+		return $settings;
 	}
 
 	public function filterSettings( $settings ) {
