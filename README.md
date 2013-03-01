@@ -118,6 +118,10 @@ Aparently the database queries required to display the friends feed was causing 
 
 ## Changelog
 
+### 2.5.0
+* Use the new Twitter API with oAuth
+* No longer supports non-https Twitter requests (Twitter API requirement)
+
 ### 2.4.1
 * Make sure hashtags are parsed UTF-8
 * Add German translation
