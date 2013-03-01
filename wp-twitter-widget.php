@@ -188,8 +188,6 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
  * It also helps us avoid name collisions.
  */
 class wpTwitterWidget extends RangePlugin {
-	private $_api_url;
-
 	/**
 	 * @var wpTwitter
 	 */
@@ -239,8 +237,6 @@ class wpTwitterWidget extends RangePlugin {
 			'consumer-secret' => $this->_settings['twp']['consumer-secret'],
 		);
 		$this->_wp_twitter_oauth = new wpTwitter( $oauth_settings );
-
-		$this->_api_url = 'https://api.twitter.com/1.1/';
 	}
 
 	/**
