@@ -255,7 +255,7 @@ class wpTwitterWidget extends RangePlugin {
 		$this->_menuTitle = __( 'Twitter Widget', $this->_slug );
 		$this->_accessLevel = 'manage_options';
 		$this->_optionGroup = 'twp-options';
-		$this->_optionNames = array( 'twp', 'twp-authed-users', 'twp_version' );
+		$this->_optionNames = array( 'twp' );
 		$this->_optionCallbacks = array();
 		$this->_slug = 'twitter-widget-pro';
 		$this->_paypalButtonId = '9993090';
@@ -285,6 +285,9 @@ class wpTwitterWidget extends RangePlugin {
 			'consumer-secret' => $this->_settings['twp']['consumer-secret'],
 		);
 		$this->_wp_twitter_oauth = new wpTwitter( $oauth_settings );
+
+		// We want to fill 'twp-authed-users' but not overwrite them when saving
+		$this->_settings['twp-authed-users'] = apply_filters($this->_slug.'-opt-twp-authed-users', get_option('twp-authed-users'));
 	}
 
 	/**
@@ -361,6 +364,16 @@ class wpTwitterWidget extends RangePlugin {
 					$msg = __( 'There was a problem authorizing your account.', $this->_slug );
 			}
 			echo "<div class='updated'><p>" . esc_html( $msg ) . '</p></div>';
+		}
+
+		if ( empty( $this->_settings['twp']['consumer-key'] ) || empty( $this->_settings['twp']['consumer-secret'] ) ) {
+			$msg = sprintf( __( 'You need to <a href="%s">set up your Twitter app keys</a>.', $this->_slug ), $this->get_options_url() );
+			echo '<div class="error"><p>' . $msg . '</p></div>';
+		}
+
+		if ( empty( $this->_settings['twp-authed-users'] ) ) {
+			$msg = sprintf( __( 'You need to <a href="%s">authorize your Twitter accounts</a>.', $this->_slug ), $this->get_options_url() );
+			echo '<div class="error"><p>' . $msg . '</p></div>';
 		}
 	}
 
@@ -446,10 +459,20 @@ class wpTwitterWidget extends RangePlugin {
 			}
 		?>
 		</table>
+		<?php
+		if ( empty( $this->_settings['twp']['consumer-key'] ) || empty( $this->_settings['twp']['consumer-secret'] ) ) {
+		?>
+		<p>
+			<strong><?php _e( 'You need to fill in the Consumer key and Consumer secret before you can authorize accounts.', $this->_slug ) ?></strong>
+		</p>
+		<?php
+		} else {
+		?>
 		<p>
 			<a href="<?php echo esc_url( $authorize_url );?>" class="button button-large button-primary"><?php _e( 'Authorize New Account', $this->_slug ); ?></a>
 		</p>
 		<?php
+		}
 	}
 	public function general_settings_meta_box() {
 		$clear_locks_url = wp_nonce_url( add_query_arg( array( 'action' => 'clear-locks' ) ), 'clear-locks' );
@@ -471,6 +494,25 @@ class wpTwitterWidget extends RangePlugin {
 							<input id="twp_consumer_secret" name="twp[consumer-secret]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['consumer-secret'] ); ?>" size="40" />
 						</td>
 					</tr>
+					<?php
+					if ( empty( $this->_settings['twp']['consumer-key'] ) || empty( $this->_settings['twp']['consumer-secret'] ) ) {
+					?>
+					<tr valign="top">
+						<th scope="row">&nbsp;</th>
+						<td>
+							<strong><?php _e( 'Directions to get the Consumer Key and Consumer Secret', $this->_slug ) ?></strong>
+							<ol>
+								<li><a href="https://dev.twitter.com/apps/new"><?php _e( 'Add a new Twitter application', $this->_slug ) ?></a></li>
+								<li><?php _e( "Fill in Name, Description, Website, and Callback URL (don't leave any blank) with anything you want" ) ?></a></li>
+								<li><?php _e( "Agree to rules, fill out captcha, and submit your application" ) ?></a></li>
+								<li><?php _e( "Copy the Consumer key and Consumer secret into the fields above" ) ?></a></li>
+								<li><?php _e( "Click the Update Options button at the bottom of this page" ) ?></a></li>
+							</ol>
+						</td>
+					</tr>
+					<?php
+					}
+					?>
 					<tr>
 						<th scope="row">
 							<?php _e( "Clear Update Locks", $this->_slug );?>
@@ -484,6 +526,8 @@ class wpTwitterWidget extends RangePlugin {
 		<?php
 	}
 	public function default_settings_meta_box() {
+		$users = $this->get_users_list( true );
+		$lists = $this->get_lists();
 		?>
 				<p><?php _e( 'These settings are the default for the shortcodes and all of them can be overridden by specifying a different value in the shortcode itself.  All settings for widgets are locate in the individual widget.', $this->_slug ) ?></p>
 				<table class="form-table">
@@ -492,7 +536,56 @@ class wpTwitterWidget extends RangePlugin {
 							<label for="twp_username"><?php _e( 'Twitter username:', $this->_slug ); ?></label>
 						</th>
 						<td>
-							<input id="twp_username" name="twp[username]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['username'] ); ?>" size="40" />
+							<select id="twp_username" name="twp[username]">
+								<option></option>
+								<?php
+								$selected = false;
+								foreach ( $users as $u ) {
+									?>
+									<option value="<?php echo esc_attr( strtolower( $u['screen_name'] ) ); ?>"<?php $s = selected( strtolower( $u['screen_name'] ), strtolower( $this->_settings['twp']['username'] ) ) ?>><?php echo esc_html( $u['screen_name'] ); ?></option>
+									<?php
+									if ( ! empty( $s ) )
+										$selected = true;
+								}
+								?>
+							</select>
+							<?php
+							if ( ! $selected && ! empty( $this->_settings['twp']['username'] ) ) {
+								$query_args = array(
+									'action' => 'authorize',
+									'screen_name' => $this->_settings['twp']['username'],
+								);
+								$authorize_user_url = wp_nonce_url( add_query_arg( $query_args, $this->get_options_url() ), 'authorize' );
+								?>
+							<p>
+								<a href="<?php echo esc_url( $authorize_user_url ); ?>" style="color:red;">
+									<?php _e( 'You need to authorize this account.', $this->_slug ); ?>
+								</a>
+							</p>
+								<?php
+							}
+							?>
+						</td>
+					</tr>
+					<tr valign="top">
+						<th scope="row">
+							<label for="twp_list"><?php _e( 'Twitter list:', $this->_slug ); ?></label>
+						</th>
+						<td>
+							<select id="twp_list" name="twp[list]">
+								<option></option>
+								<?php
+								foreach ( $lists as $user => $user_lists ) {
+									echo '<optgroup label="' . esc_attr( $user ) . '">';
+									foreach ( $user_lists as $list_id => $list_name ) {
+										?>
+										<option value="<?php echo esc_attr( $user . '::' . $list_id ); ?>"<?php $s = selected( $user . '::' . $list_id, strtolower( $this->_settings['twp']['list'] ) ) ?>><?php echo esc_html( $list_name ); ?></option>
+										<?php
+									}
+									echo '</optgroup>';
+								}
+								?>
+							</select>
 						</td>
 					</tr>
 					<tr valign="top">
@@ -1166,6 +1259,8 @@ class wpTwitterWidget extends RangePlugin {
 
 	public function filterSettings( $settings ) {
 		$defaultArgs = array(
+			'consumer-key'    => '',
+			'consumer-secret' => '',
 			'title'           => '',
 			'errmsg'          => '',
 			'fetchTimeOut'    => '2',
