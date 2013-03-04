@@ -118,6 +118,10 @@ Aparently the database queries required to display the friends feed was causing 
 
 ## Changelog
 
+### 2.5.1
+* Rename OAuthUtil class to twpOAuthUtil
+* Don't use 'account/verify_credentials' as it has a very low limit
+
 ### 2.5.0
 * Use the new Twitter API with oAuth
 * No longer supports non-https Twitter requests (Twitter API requirement)
