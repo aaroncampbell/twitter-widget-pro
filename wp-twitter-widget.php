@@ -168,10 +168,6 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				<input class="widefat" id="<?php echo $this->get_field_id( 'errmsg' ); ?>" name="<?php echo $this->get_field_name( 'errmsg' ); ?>" type="text" value="<?php esc_attr_e( $instance['errmsg'] ); ?>" />
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'fetchTimeOut' ); ?>"><?php _e( 'Number of seconds to wait for a response from Twitter ( default 2 ):', $this->_slug ); ?></label>
-				<input class="widefat" id="<?php echo $this->get_field_id( 'fetchTimeOut' ); ?>" name="<?php echo $this->get_field_name( 'fetchTimeOut' ); ?>" type="text" value="<?php esc_attr_e( $instance['fetchTimeOut'] ); ?>" />
-			</p>
-			<p>
 				<label for="<?php echo $this->get_field_id( 'showts' ); ?>"><?php _e( 'Show date/time of Tweet ( rather than 2 ____ ago ):', $this->_slug ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'showts' ); ?>" name="<?php echo $this->get_field_name( 'showts' ); ?>">
 					<option value="0" <?php selected( $instance['showts'], '0' ); ?>><?php _e( 'Always', $this->_slug );?></option>
@@ -629,14 +625,6 @@ class wpTwitterWidget extends RangePlugin {
 						</th>
 						<td>
 							<input id="twp_errmsg" name="twp[errmsg]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['errmsg'] ); ?>" size="40" />
-						</td>
-					</tr>
-					<tr valign="top">
-						<th scope="row">
-							<label for="twp_fetchTimeOut"><?php _e( 'Number of seconds to wait for a response from Twitter ( default 2 ):', $this->_slug ); ?></label>
-						</th>
-						<td>
-							<input id="twp_fetchTimeOut" name="twp[fetchTimeOut]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['fetchTimeOut'] ); ?>" size="40" />
 						</td>
 					</tr>
 					<tr valign="top">
@@ -1181,7 +1169,6 @@ class wpTwitterWidget extends RangePlugin {
 			'after_title'     => '</h2>',
 			'title'           => '',
 			'errmsg'          => '',
-			'fetchTimeOut'    => '2',
 			'username'        => '',
 			'hidereplies'     => 'false',
 			'showretweets'    => 'true',
@@ -1200,10 +1187,6 @@ class wpTwitterWidget extends RangePlugin {
 		 * Attribute names are strtolower'd, so we need to fix them to match
 		 * the names used through the rest of the plugin
 		 */
-		if ( array_key_exists( 'fetchtimeout', $attr ) ) {
-			$attr['fetchTimeOut'] = $attr['fetchtimeout'];
-			unset( $attr['fetchtimeout'] );
-		}
 		if ( array_key_exists( 'showxavisyslink', $attr ) ) {
 			$attr['showXavisysLink'] = $attr['showxavisyslink'];
 			unset( $attr['showxavisyslink'] );
@@ -1262,7 +1245,6 @@ class wpTwitterWidget extends RangePlugin {
 			'consumer-secret' => '',
 			'title'           => '',
 			'errmsg'          => '',
-			'fetchTimeOut'    => '2',
 			'username'        => '',
 			'list'            => '',
 			'http_vs_https'   => 'https',
