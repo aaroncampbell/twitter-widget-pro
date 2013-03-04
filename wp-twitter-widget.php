@@ -404,9 +404,9 @@ class wpTwitterWidget extends RangePlugin {
 		<?php
 		foreach ( $this->_settings['twp-authed-users'] as $u ) {
 			$this->_wp_twitter_oauth->set_token( $u );
-			$user_info = $this->_wp_twitter_oauth->send_authed_request( 'account/verify_credentials', 'GET' );
+			$rates = $this->_wp_twitter_oauth->send_authed_request( 'application/rate_limit_status', 'GET', array( 'resources' => 'statuses,lists' ) );
 			$style = $auth_link = '';
-			if ( is_wp_error( $user_info ) ) {
+			if ( is_wp_error( $rates ) ) {
 				$query_args = array(
 					'action' => 'authorize',
 					'screen_name' => $u['screen_name'],
@@ -421,7 +421,6 @@ class wpTwitterWidget extends RangePlugin {
 						<strong>@<?php echo esc_html( $u['screen_name'] ) . $auth_link; ?></strong>
 					</th>
 					<?php
-					$rates = $this->_wp_twitter_oauth->send_authed_request( 'application/rate_limit_status', 'GET', array( 'resources' => 'statuses,lists' ) );
 					if ( ! is_wp_error( $rates ) ) {
 						$display_rates = array(
 							__( 'Lists', $this->_slug ) => $rates->resources->lists->{'/lists/statuses'},
