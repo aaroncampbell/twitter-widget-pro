@@ -359,7 +359,8 @@ class wpTwitterWidget extends RangePlugin {
 				else
 					$msg = __( 'There was a problem authorizing your account.', $this->_slug );
 			}
-			echo "<div class='updated'><p>" . esc_html( $msg ) . '</p></div>';
+			if ( ! empty( $msg ) )
+				echo "<div class='updated'><p>" . esc_html( $msg ) . '</p></div>';
 		}
 
 		if ( empty( $this->_settings['twp']['consumer-key'] ) || empty( $this->_settings['twp']['consumer-secret'] ) ) {
