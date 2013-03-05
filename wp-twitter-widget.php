@@ -1083,8 +1083,8 @@ class wpTwitterWidget extends RangePlugin {
 		if ( 'true' == $widgetOptions['hidereplies'] )
 			$parameters['exclude_replies'] = 'true';
 
-		if ( 'true' == $widgetOptions['showretweets'] )
-			$parameters['include_rts'] = 'true';
+		if ( 'true' != $widgetOptions['showretweets'] )
+			$parameters['include_rts'] = 'false';
 
 		return $parameters;
 
