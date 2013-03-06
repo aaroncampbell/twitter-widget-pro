@@ -710,7 +710,7 @@ class wpTwitterWidget extends RangePlugin {
 	}
 
 	/**
-	 * Replace #hashtag with a link to search.twitter.com for that hashtag
+	 * Replace #hashtag with a link to twitter.com for that hashtag
 	 *
 	 * @param string $text - Tweet text
 	 * @return string - Tweet text with #hashtags linked
@@ -721,14 +721,14 @@ class wpTwitterWidget extends RangePlugin {
 	}
 
 	/**
-	 * Replace #hashtag with a link to search.twitter.com for that hashtag
+	 * Replace #hashtag with a link to twitter.com for that hashtag
 	 *
 	 * @param array $matches - Tweet text
 	 * @return string - Tweet text with #hashtags linked
 	 */
 	private function _linkHashtagsCallback( $matches ) {
 		$linkAttrs = array(
-			'href'	=> 'http://search.twitter.com/search?q=' . urlencode( $matches[2] ),
+			'href'	=> 'http://twitter.com/search?q=' . urlencode( $matches[2] ),
 			'class'	=> 'twitter-hashtag'
 		);
 		return $matches[1] . $this->_buildLink( $matches[2], $linkAttrs );
