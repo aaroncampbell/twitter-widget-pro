@@ -118,6 +118,12 @@ Aparently the database queries required to display the friends feed was causing 
 
 ## Changelog
 
+### 2.5.2
+* Don't force verification of Twitter's SSL certificate
+* Fix empty admin notice
+* Fix bug with retweets not being ignored
+* Fix hashtag links
+
 ### 2.5.1
 * Rename OAuthUtil class to twpOAuthUtil
 * Don't use 'account/verify_credentials' as it has a very low limit
