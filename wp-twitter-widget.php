@@ -318,8 +318,10 @@ class wpTwitterWidget extends RangePlugin {
 			check_admin_referer( 'authorize' );
 			$auth_redirect = add_query_arg( array( 'action' => 'authorized' ), $this->get_options_url() );
 			$token = $this->_wp_twitter_oauth->getRequestToken( $auth_redirect );
-			if ( is_wp_error( $token ) )
+			if ( is_wp_error( $token ) ) {
+				$this->_error = $token;
 				return;
+			}
 			update_option( '_twp_request_token_'.$token['nonce'], $token );
 			$screen_name = empty( $_GET['screen_name'] )? '':$_GET['screen_name'];
 			wp_redirect( $this->_wp_twitter_oauth->get_authorize_url( $screen_name ) );
@@ -361,6 +363,11 @@ class wpTwitterWidget extends RangePlugin {
 			}
 			if ( ! empty( $msg ) )
 				echo "<div class='updated'><p>" . esc_html( $msg ) . '</p></div>';
+		}
+
+		if ( ! empty( $this->_error ) && is_wp_error( $this->_error ) ) {
+			$msg = '<p>' . implode( '</p><p>', $this->_error->get_error_messages() ) . '</p>';
+			echo '<div class="error">' . $msg . '</div>';
 		}
 
 		if ( empty( $this->_settings['twp']['consumer-key'] ) || empty( $this->_settings['twp']['consumer-secret'] ) ) {
