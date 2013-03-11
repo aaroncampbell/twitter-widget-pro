@@ -118,6 +118,10 @@ Aparently the database queries required to display the friends feed was causing 
 
 ## Changelog
 
+### 2.5.3
+* Don't force verification of Twitter's SSL certificate
+* Add support for Twitter Lists in shortcodes
+
 ### 2.5.2
 * Don't force verification of Twitter's SSL certificate
 * Fix empty admin notice
