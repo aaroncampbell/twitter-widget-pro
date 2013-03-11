@@ -1178,6 +1178,7 @@ class wpTwitterWidget extends RangePlugin {
 			'title'           => '',
 			'errmsg'          => '',
 			'username'        => '',
+			'list'            => '',
 			'hidereplies'     => 'false',
 			'showretweets'    => 'true',
 			'hidefrom'        => 'false',
