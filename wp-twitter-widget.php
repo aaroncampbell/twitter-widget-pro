@@ -820,6 +820,7 @@ class wpTwitterWidget extends RangePlugin {
 		$attributes = wp_parse_args( $attributes );
 
 		$text = apply_filters( 'widget_twitter_link_text', $text );
+		$noFilter = apply_filters( 'widget_twitter_link_nofilter', $noFilter );
 		$link = '<a';
 		foreach ( $attributes as $name => $value ) {
 			$link .= ' ' . esc_attr( $name ) . '="' . esc_attr( $value ) . '"';
