@@ -894,10 +894,9 @@ class wpTwitterWidget extends RangePlugin {
 				if (!empty($args['hashFilter'])) {
 					$foundHash = false;
 					foreach ($args['hashFilter'] as $hash) {
-						if (stripos($tweet->text, trim($hash)) === false) {
-							continue;
+						if (stripos($tweet->text, trim($hash)) !== false) {
+							$foundHash = true;
 						}
-						$foundHash = true;
 					}
 					if (!$foundHash) {
 						continue;
