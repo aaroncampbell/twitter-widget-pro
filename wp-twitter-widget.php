@@ -339,10 +339,12 @@ class wpTwitterWidget extends RangePlugin {
 			delete_option( '_twp_request_token_'.$_GET['nonce'] );
 
 			$token = $this->_wp_twitter_oauth->get_access_token( $_GET['oauth_verifier'] );
-			$this->_settings['twp-authed-users'][strtolower($token['screen_name'])] = $token;
-			update_option( 'twp-authed-users', $this->_settings['twp-authed-users'] );
+			if ( ! is_wp_error( $token ) ) {
+				$this->_settings['twp-authed-users'][strtolower($token['screen_name'])] = $token;
+				update_option( 'twp-authed-users', $this->_settings['twp-authed-users'] );
 
-			$redirect_args['authorized'] = $token['screen_name'];
+				$redirect_args['authorized'] = $token['screen_name'];
+			}
 			wp_safe_redirect( add_query_arg( $redirect_args, $this->get_options_url() ) );
 			exit;
 		}
