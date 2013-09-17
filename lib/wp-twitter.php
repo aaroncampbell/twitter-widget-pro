@@ -117,7 +117,7 @@ class wpTwitter {
 
 		if ( !is_wp_error( $resp ) && $resp['response']['code'] >= 200 && $resp['response']['code'] < 300 ) {
 			$decoded_response = json_decode( $resp['body'] );
-			if ( empty( $decoded_response ) && ! empty( $resp['body'] ) )
+			if ( ! is_array( $decoded_response ) && ! empty( $resp['body'] ) )
 				$decoded_response = wp_parse_args( $resp['body'] );
 			return $decoded_response;
 		} else {
