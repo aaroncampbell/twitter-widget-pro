@@ -1085,10 +1085,12 @@ class wpTwitterWidget extends RangePlugin {
 			'count'       => $widgetOptions['items'],
 		);
 
-		if ( ! empty( $widgetOptions['username'] ) )
+		if ( ! empty( $widgetOptions['username'] ) ) {
 			$parameters['screen_name'] = $widgetOptions['username'];
-		elseif ( ! empty( $widgetOptions['list'] ) )
-			$parameters['list_id'] = array_pop( explode( '::', $widgetOptions['list'] ) );
+		} elseif ( ! empty( $widgetOptions['list'] ) ) {
+			$list_info = explode( '::', $widgetOptions['list'] );
+			$parameters['list_id'] = array_pop( $list_info );
+		}
 
 		if ( 'true' == $widgetOptions['hidereplies'] )
 			$parameters['exclude_replies'] = 'true';
