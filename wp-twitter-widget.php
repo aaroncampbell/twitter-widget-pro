@@ -194,6 +194,14 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				<label for="<?php echo $this->get_field_id( 'showXavisysLink' ); ?>"><?php _e( 'Show Link to Twitter Widget Pro', $this->_slug ); ?></label>
 			</p>
 			<p><?php echo $wpTwitterWidget->get_support_forum_link(); ?></p>
+			<script type="text/javascript">
+				jQuery( '#<?php echo $this->get_field_id( 'username' ) ?>' ).on( 'change', function() {
+					jQuery('#<?php echo $this->get_field_id( 'list' ) ?>' ).val(0);
+				});
+				jQuery( '#<?php echo $this->get_field_id( 'list' ) ?>' ).on( 'change', function() {
+					jQuery('#<?php echo $this->get_field_id( 'username' ) ?>' ).val(0);
+				});
+			</script>
 <?php
 		return;
 	}
