@@ -166,7 +166,7 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 			<p>
 				<label for="<?php echo $this->get_field_id( 'errmsg' ); ?>"><?php _e( 'What to display when Twitter is down ( optional ):', $this->_slug ); ?></label>
 				<input class="widefat" id="<?php echo $this->get_field_id( 'errmsg' ); ?>" name="<?php echo $this->get_field_name( 'errmsg' ); ?>" type="text" value="<?php esc_attr_e( $instance['errmsg'] ); ?>" />
-			</p>
+			</p>		
 			<p>
 				<label for="<?php echo $this->get_field_id( 'showts' ); ?>"><?php _e( 'Show date/time of Tweet ( rather than 2 ____ ago ):', $this->_slug ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'showts' ); ?>" name="<?php echo $this->get_field_name( 'showts' ); ?>">
@@ -183,6 +183,10 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				<label for="<?php echo $this->get_field_id( 'dateFormat' ); ?>"><?php echo sprintf( __( 'Format to display the date in, uses <a href="%s">PHP date()</a> format:', $this->_slug ), 'http://php.net/date' ); ?></label>
 				<input class="widefat" id="<?php echo $this->get_field_id( 'dateFormat' ); ?>" name="<?php echo $this->get_field_name( 'dateFormat' ); ?>" type="text" value="<?php esc_attr_e( $instance['dateFormat'] ); ?>" />
 			</p>
+			<p>
+				<label for="<?php echo $this->get_field_id( 'hashFilter' ); ?>"><?php echo sprintf( __( 'Only show tweets that contain at least one of the following hash tags (comma separated):', $this->_slug )); ?></label>
+				<input class="widefat" id="<?php echo $this->get_field_id( 'hashFilter' ); ?>" name="<?php echo $this->get_field_name( 'hashFilter' ); ?>" type="text" value="<?php esc_attr_e( $instance['hashFilter'] ); ?>" />
+			</p>			
 			<p>
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'targetBlank' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'targetBlank' ); ?>" name="<?php echo $this->get_field_name( 'targetBlank' ); ?>"<?php checked( $instance['targetBlank'], 'true' ); ?> />
@@ -854,6 +858,9 @@ class wpTwitterWidget extends RangePlugin {
 		if ( 'true' == $args['targetBlank'] )
 			add_filter( 'widget_twitter_link_attributes', array( $this, 'targetBlank' ) );
 
+		if (!empty($args['hashFilter'])) {
+			$args['hashFilter'] = explode(',', $args['hashFilter']);
+		}	
 		// Validate our options
 		$args['items'] = (int) $args['items'];
 		if ( $args['items'] < 1 || 20 < $args['items'] )
@@ -885,6 +892,18 @@ class wpTwitterWidget extends RangePlugin {
 		} else {
 			$count = 0;
 			foreach ( $tweets as $tweet ) {
+				// Check if at least one hash occurs in tweet text
+				if (!empty($args['hashFilter'])) {
+					$foundHash = false;
+					foreach ($args['hashFilter'] as $hash) {
+						if (stripos($tweet->text, trim($hash)) !== false) {
+							$foundHash = true;
+						}
+					}
+					if (!$foundHash) {
+						continue;
+					}
+				}		
 				// Set our "ago" string which converts the date to "# ___(s) ago"
 				$tweet->ago = $this->_timeSince( strtotime( $tweet->created_at ), $args['showts'], $args['dateFormat'] );
 				$entryContent = apply_filters( 'widget_twitter_content', $tweet->text, $tweet );
