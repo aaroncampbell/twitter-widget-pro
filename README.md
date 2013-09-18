@@ -120,6 +120,12 @@ Aparently the database queries required to display the friends feed was causing 
 
 ## Changelog
 
+### 2.6.0
+* Add ability to remove accounts
+* Fix bug that made lists not work
+* Work around PHP bug in json_decode() - https://bugs.php.net/bug.php?id=45989
+* Fix some strict standards warnings
+
 ### 2.5.4
 * Minor fix for a strict PHP notice
 
