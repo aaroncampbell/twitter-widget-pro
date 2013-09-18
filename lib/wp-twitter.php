@@ -126,7 +126,7 @@ class wpTwitter {
 			 * also check if a string is returned that has an = in it and if
 			 * that's the case assume it's a string that needs to fall back to
 			 * using wp_parse_args()
-			 * @see http://www.justskins.com/forums/45989-new-json_decode-passes-254963.html#post855161
+			 * @see https://bugs.php.net/bug.php?id=45989
 			 * @see https://github.com/OpenRange/twitter-widget-pro/pull/8
 			 */
 			if ( ( ! isset( $decoded_response ) && ! empty( $resp['body'] ) ) || ( is_string( $decoded_response ) && false !== strpos( $resp['body'], '=' ) ) )
