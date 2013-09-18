@@ -1079,7 +1079,8 @@ class wpTwitterWidget extends RangePlugin {
 					return $response;
 			}
 		} elseif ( ! empty( $parameters['list_id'] ) ) {
-			$user = array_shift( explode( '::', $widgetOptions['list'] ) );
+			$list_info = explode( '::', $widgetOptions['list'] );
+			$user = array_shift( $list_info );
 			$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][strtolower( $user )] );
 
 			$response = $this->_wp_twitter_oauth->send_authed_request( 'lists/statuses', 'GET', $parameters );
