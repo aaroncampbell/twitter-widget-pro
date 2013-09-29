@@ -267,6 +267,8 @@ class wpTwitterWidget extends RangePlugin {
 		/**
 		 * Add filters and actions
 		 */
+		add_action( 'init', array( $this, 'init' ) );
+		add_filter( 'nonce_user_logged_out', array( $this, 'nonce_user_logged_out' ), null, 2 );
 		add_action( 'admin_init', array( $this, 'handle_actions' ) );
 		add_action( 'admin_notices', array( $this, 'show_messages' ) );
 		add_action( 'widgets_init', array( $this, 'register' ), 11 );
@@ -558,6 +560,37 @@ class wpTwitterWidget extends RangePlugin {
 						<td>
 							<a href="<?php echo esc_url( $clear_locks_url ); ?>"><?php _e( 'Clear Update Locks', $this->_slug ); ?></a><br />
 							<small><?php _e( "A small percentage of servers seem to have issues where an update lock isn't getting cleared.  If you're experiencing issues with your feed not updating, try clearing the update locks.", $this->_slug ); ?></small>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">
+							<?php _e( 'Local requests:', $this->_slug ); ?>
+						</th>
+						<td>
+						<?php
+							if ( ! empty( $_GET['action'] ) && 'test-local-request' == $_GET['action'] ) {
+								check_admin_referer( 'test-local-request' );
+
+								$server_url = home_url( '/?twp-test-local-request' );
+								$resp = wp_remote_post( $server_url, array( 'body' => array( '_wpnonce' => wp_create_nonce( 'twp-test-local-request' ), 'uid' => get_current_user_id() ), 'sslverify' => apply_filters( 'https_local_ssl_verify', true ) ) );
+								if ( !is_wp_error( $resp ) && $resp['response']['code'] >= 200 && $resp['response']['code'] < 300 ) {
+									if ( 'success' == wp_remote_retrieve_body( $resp ) )
+										_e( '<p style="color:green;">Local requests appear to be functioning normally.</p>', $this->_slug );
+									else
+										_e( '<p style="color:red;">The request went through, but an unexpected response was received.</p>', $this->_slug );
+								} else {
+									printf( __( '<p style="color:red;">Failed.  Your server said: %s</p>', $this->_slug ), $resp['response']['message'] );
+								}
+							}
+							$query_args = array(
+								'action' => 'test-local-request',
+							);
+							$test_local_url = wp_nonce_url( add_query_arg( $query_args, $this->get_options_url() ), 'test-local-request' );
+							?>
+							<a href="<?php echo esc_url( $test_local_url ); ?>" class="button">
+								<?php _e( 'Test local requests', $this->_slug ); ?>
+							</a><br />
+							<small><?php _e( "Twitter Widget Pro updates tweets in the background by placing a local request to your server.  If your Tweets aren't updating, test this.  If it fails, let your host know that loopback requests aren't working on your site.", $this->_slug ); ?></small>
 						</td>
 					</tr>
 				</table>
@@ -1361,6 +1394,17 @@ class wpTwitterWidget extends RangePlugin {
 			}
 		}
 		return $this->_lists;
+	}
+
+	public function init() {
+		if ( isset( $_GET['twp-test-local-request'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'twp-test-local-request' ) )
+			die( 'success' );
+	}
+
+	public function nonce_user_logged_out( $uid, $action ) {
+		if ( 'twp-test-local-request' == $action && isset( $_POST['uid'] ) )
+			$uid = absint( $_POST['uid'] );
+		return $uid;
 	}
 }
 // Instantiate our class
