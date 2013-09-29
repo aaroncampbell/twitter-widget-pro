@@ -367,7 +367,7 @@ if (!class_exists('RangePlugin')) {
 			_e('Then please do any or all of the following:', $this->_slug);
 			echo '</p><ul>';
 
-			$url = apply_filters('range-plugin-url-'.$this->_slug, 'http://bluedogwebservices.com/wordpress-plugin/'.$this->_slug);
+			$url = apply_filters('range-plugin-url-'.$this->_slug, 'http://ran.ge/wordpress-plugin/'.$this->_slug);
 			echo "<li><a href='{$url}'>";
 			_e('Link to it so others can find out about it.', $this->_slug);
 			echo "</a></li>";
