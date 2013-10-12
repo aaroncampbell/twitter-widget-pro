@@ -139,6 +139,18 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				</select>
 			</p>
 			<p>
+			  <label for="<?php echo $this->get_field_id( 'addclass' ); ?>"><?php _e( 'CSS Class to give widget (optional):', $this->_slug ); ?></label>
+			  <input class="widefat" id="<?php echo $this->get_field_id( 'addclass' ); ?>" name="<?php echo $this->get_field_name( 'addclass' ); ?>" type="text" value="<?php esc_attr_e( $instance['addclass'] ); ?>" />
+			</p>
+			<p>
+			  <label for="<?php echo $this->get_field_id( 'before_twp' ); ?>"><?php _e( 'Content added before widget ( optional ):', $this->_slug ); ?></label>
+			  <input class="widefat" id="<?php echo $this->get_field_id( 'before_twp' ); ?>" name="<?php echo $this->get_field_name( 'before_twp' ); ?>" type="text" value="<?php esc_attr_e( $instance['before_twp'] ); ?>" />
+			</p>
+			<p>
+			  <label for="<?php echo $this->get_field_id( 'after_twp' ); ?>"><?php _e( 'Content added after widget ( optional ):', $this->_slug ); ?></label>
+			  <input class="widefat" id="<?php echo $this->get_field_id( 'after_twp' ); ?>" name="<?php echo $this->get_field_name( 'after_twp' ); ?>" type="text" value="<?php esc_attr_e( $instance['after_twp'] ); ?>" />
+			</p>
+			<p>
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showretweets' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showretweets' ); ?>" name="<?php echo $this->get_field_name( 'showretweets' ); ?>"<?php checked( $instance['showretweets'], 'true' ); ?> />
 				<label for="<?php echo $this->get_field_id( 'showretweets' ); ?>"><?php _e( 'Include retweets', $this->_slug ); ?></label>
@@ -162,6 +174,13 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showfollow' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showfollow' ); ?>" name="<?php echo $this->get_field_name( 'showfollow' ); ?>"<?php checked( $instance['showfollow'], 'true' ); ?> />
 				<label for="<?php echo $this->get_field_id( 'showfollow' ); ?>"><?php _e( 'Show Follow Link', $this->_slug ); ?></label>
+			</p>
+			<p>
+			  <label for="<?php echo $this->get_field_id( 'followposition' ); ?>"><?php _e( 'Follow Link Position (if shown):', $this->_slug ); ?></label>
+			  <select id="<?php echo $this->get_field_id( 'followposition' ); ?>" name="<?php echo $this->get_field_name( 'followposition' ); ?>">
+			    <option value="top" <?php selected( $instance['followposition'], 'top'); ?>><?php _e('Top', $this->_slug); ?></option>
+			    <option value="bottom" <?php selected( $instance['followposition'], 'bottom'); ?>><?php _e('Bottom', $this->_slug); ?></option>
+			  </select>
 			</p>
 			<p>
 				<label for="<?php echo $this->get_field_id( 'errmsg' ); ?>"><?php _e( 'What to display when Twitter is down ( optional ):', $this->_slug ); ?></label>
@@ -720,6 +739,30 @@ class wpTwitterWidget extends RangePlugin {
 						</td>
 					</tr>
 					<tr valign="top">
+					  <th scope="row">
+					    <label for="twp_addclass"><?php _e( 'CSS Class to give widget (optional):', $this->_slug ); ?></label>
+					  </th>
+					  <td>
+					    <input id="twp_addclass" name="twp[addclass]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['addclass'] ); ?>" size="40" />
+					  </td>
+					</tr>
+					<tr valign="top">
+					  <th scope="row">
+					    <label for="twp_before_twp"><?php _e( 'Content added before widget (optional):', $this->_slug ); ?></label>
+					  </th>
+					  <td>
+					    <input id="twp_before_twp" name="twp[before_twp]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['before_twp'] ); ?>" size="40" />
+					  </td>
+					</tr>
+					<tr valign="top">
+					  <th scope="row">
+					    <label for="twp_after_twp"><?php _e( 'Content added after widget (optional):', $this->_slug ); ?></label>
+					  </th>
+					  <td>
+					    <input id="twp_after_twp" name="twp[after_twp]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['after_twp'] ); ?>" size="40" />
+					  </td>
+					</tr>
+					<tr valign="top">
 						<th scope="row">
 							<label for="twp_dateFormat"><?php echo sprintf( __( 'Format to display the date in, uses <a href="%s">PHP date()</a> format:', $this->_slug ), 'http://php.net/date' ); ?></label>
 						</th>
@@ -752,11 +795,17 @@ class wpTwitterWidget extends RangePlugin {
 							<input class="checkbox" type="checkbox" value="true" id="twp_showfollow" name="twp[showfollow]"<?php checked( $this->_settings['twp']['showfollow'], 'true' ); ?> />
 							<label for="twp_showfollow"><?php _e( 'Show Follow Link', $this->_slug ); ?></label>
 							<br />
+						  <label for="twp_followposition"><?php _e('Follow link position (if shown):', $this->_slug); ?></label>
+							<select id="twp_followposition" name="twp[followposition]">
+							  <option value="top" <?php selected($this->_settings['twp']['followposition'], 'top'); ?>><?php _e('Top', $this->_slug);?></option>
+							  <option value="bottom" <?php selected($this->_settings['twp']['followposition'], 'bottom'); ?>><?php _e('Bottom', $this->_slug);?></option>
+							</select>
+							<br />
 							<input type="hidden" value="false" name="twp[targetBlank]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_targetBlank" name="twp[targetBlank]"<?php checked( $this->_settings['twp']['targetBlank'], 'true' ); ?> />
 							<label for="twp_targetBlank"><?php _e( 'Open links in a new window', $this->_slug ); ?></label>
 							<br />
-							<input type="hidden" value="false" name="twp[showXavisysLink" />
+							<input type="hidden" value="false" name="twp[showXavisysLink]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_showXavisysLink" name="twp[showXavisysLink]"<?php checked( $this->_settings['twp']['showXavisysLink'], 'true' ); ?> />
 							<label for="twp_showXavisysLink"><?php _e( 'Show Link to Twitter Widget Pro', $this->_slug ); ?></label>
 						</td>
@@ -931,8 +980,14 @@ class wpTwitterWidget extends RangePlugin {
 		$tweets = $this->_getTweets( $args );
 		if ( false === $tweets )
 			return '';
-
-		$widgetContent = $args['before_widget'] . '<div>';
+			
+    $widgetContent = $args['before_widget'];
+		$widgetContent .= $args['before_twp'];
+		if ($args['addclass'] != '') {
+		  $widgetContent .= '<div class="' . $args['addclass'] . '">';
+		}else{
+		  $widgetContent .= '<div>';
+		}
 
 		if ( empty( $args['title'] ) )
 			$args['title'] = sprintf( __( 'Twitter: %s', $this->_slug ), $args['username'] );
@@ -945,7 +1000,25 @@ class wpTwitterWidget extends RangePlugin {
 			$widgetContent .= $this->_getProfileImage( $tweets[0]->user, $args );
 			$widgetContent .= '</div>';
 		}
-		$widgetContent .= '<ul>';
+		if ( 'true' == $args['showfollow'] && ! empty( $args['username'] ) ) {
+			$follow_button = '<span class="follow-button">';
+			$linkText = "@{$args['username']}";
+			$linkAttrs = array(
+				'href'	=> "http://twitter.com/{$args['username']}",
+				'class'	=> 'twitter-follow-button',
+				'title'	=> sprintf( __( 'Follow %s', $this->_slug ), "@{$args['username']}" ),
+			);
+			$lang = $this->_getTwitterLang();
+			if ( !empty( $lang ) )
+				$linkAttrs['data-lang'] = $lang;
+
+			$follow_button .= $this->_buildLink( $linkText, $linkAttrs );
+			$follow_button .= '</span>';
+		}
+		if ('top' == $args['followposition'] && isset( $follow_button ) ) {
+		  $widgetContent .= $follow_button;
+		}
+		$widgetContent .= '<ul class="twp-tweets">';
 		if ( ! is_array( $tweets ) || count( $tweets ) == 0 ) {
 			$widgetContent .= '<li class="wpTwitterWidgetEmpty">' . __( 'No Tweets Available', $this->_slug ) . '</li>';
 		} else {
@@ -954,7 +1027,8 @@ class wpTwitterWidget extends RangePlugin {
 				// Set our "ago" string which converts the date to "# ___(s) ago"
 				$tweet->ago = $this->_timeSince( strtotime( $tweet->created_at ), $args['showts'], $args['dateFormat'] );
 				$entryContent = apply_filters( 'widget_twitter_content', $tweet->text, $tweet );
-				$widgetContent .= '<li>';
+				$even_odd = ($count % 2) ? 'even' : 'odd';
+				$widgetContent .= '<li class="' . $even_odd . '">';
 				$widgetContent .= "<span class='entry-content'>{$entryContent}</span>";
 				$widgetContent .= " <span class='entry-meta'>";
 				$widgetContent .= "<span class='time-meta'>";
@@ -1013,20 +1087,9 @@ class wpTwitterWidget extends RangePlugin {
 		}
 
 		$widgetContent .= '</ul>';
-		if ( 'true' == $args['showfollow'] && ! empty( $args['username'] ) ) {
-			$widgetContent .= '<div class="follow-button">';
-			$linkText = "@{$args['username']}";
-			$linkAttrs = array(
-				'href'	=> "http://twitter.com/{$args['username']}",
-				'class'	=> 'twitter-follow-button',
-				'title'	=> sprintf( __( 'Follow %s', $this->_slug ), "@{$args['username']}" ),
-			);
-			$lang = $this->_getTwitterLang();
-			if ( !empty( $lang ) )
-				$linkAttrs['data-lang'] = $lang;
-
-			$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
-			$widgetContent .= '</div>';
+		
+		if ('bottom' == $args['followposition'] && isset( $follow_button ) ) {
+		  $widgetContent .= $follow_button;
 		}
 
 		if ( 'true' == $args['showXavisysLink'] ) {
@@ -1039,8 +1102,8 @@ class wpTwitterWidget extends RangePlugin {
 			$widgetContent .= $this->_buildLink( 'WordPress Twitter Widget Pro', $linkAttrs );
 			$widgetContent .= '</span></div>';
 		}
-		$widgetContent .= '</div>' . $args['after_widget'];
-
+		$widgetContent .= '</div>' . $args['after_twp'];
+    $widgetContent .= $args['after_widget'];
 		if ( 'true' == $args['showintents'] || 'true' == $args['showfollow'] ) {
 			$script = 'http://platform.twitter.com/widgets.js';
 			if ( is_ssl() )
@@ -1243,8 +1306,9 @@ class wpTwitterWidget extends RangePlugin {
 	 */
     public function handleShortcodes( $attr, $content = '' ) {
 		$defaults = array(
-			'before_widget'   => '',
-			'after_widget'    => '',
+			'before_twp'   => '',
+			'after_twp'    => '',
+			'addclass'        => '',
 			'before_title'    => '<h2>',
 			'after_title'     => '</h2>',
 			'title'           => '',
@@ -1256,6 +1320,7 @@ class wpTwitterWidget extends RangePlugin {
 			'hidefrom'        => 'false',
 			'showintents'     => 'true',
 			'showfollow'      => 'true',
+			'followposition'  => 'bottom',
 			'avatar'          => '',
 			'showXavisysLink' => 'false',
 			'targetBlank'     => 'false',
@@ -1301,7 +1366,10 @@ class wpTwitterWidget extends RangePlugin {
 
 		if ( $attr['showfollow'] && $attr['showfollow'] != 'true' && $attr['showfollow'] != '1' )
 			$attr['showfollow'] = 'false';
-
+    
+    if (!in_array($attr['followposition'], array('top', 'bottom') ) )
+      $attr['followposition'] = 'bottom';
+      
 		if ( !in_array( $attr['avatar'], array( 'bigger', 'normal', 'mini', 'original', '' ) ) )
 			$attr['avatar'] = 'normal';
 
@@ -1322,6 +1390,9 @@ class wpTwitterWidget extends RangePlugin {
 
 	public function filterSettings( $settings ) {
 		$defaultArgs = array(
+			'before_twp'   => '',
+			'after_twp'    => '',
+			'addclass'        => '',
 			'consumer-key'    => '',
 			'consumer-secret' => '',
 			'title'           => '',
@@ -1334,6 +1405,7 @@ class wpTwitterWidget extends RangePlugin {
 			'hidefrom'        => 'false',
 			'showintents'     => 'true',
 			'showfollow'      => 'true',
+			'followposition'  => 'bottom',
 			'avatar'          => '',
 			'showXavisysLink' => 'false',
 			'targetBlank'     => 'false',
