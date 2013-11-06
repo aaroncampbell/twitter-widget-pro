@@ -1,10 +1,10 @@
 === Twitter Widget Pro ===
-Contributors: aaroncampbell, PeteMall, range, saracannon
+Contributors: aaroncampbell, PeteMall, range, saracannon, PerS
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=9993090
 Tags: twitter, widget, feed
 Requires at least: 3.0
-Tested up to: 3.6
-Stable tag: 2.6.0
+Tested up to: 3.7.1
+Stable tag: 2.6.1
 
 A widget that properly handles twitter feeds, including parsing @username, #hashtags, and URLs into links.
 
@@ -60,6 +60,7 @@ However, there are more things you can control.
 * dateFormat - The format for dates (defaults to'h:i:s A F d, Y' or it's localization)
 * title - The title of the widget (defaults to 'Twitter: Username')
 * showretweets - set to true to show retweets, false to hide them (defaults to true)
+* showmentions - set to true to show mentions, false to hide them (defaults to false)
 * showintents - set to true to show the reply, retweet, and favorite links for each tweet, false to hide them (defaults to true)
 * showfollow - set to true to show the follow button after tweets, false to hide it (defaults to true)
 
@@ -130,6 +131,9 @@ Aparently the database queries required to display the friends feed was causing 
 4. By using some (X)HTML in the title element and adding a few styles and a background image, you could make it look like this.
 
 == Upgrade Notice ==
+
+= 2.6.1 =
+Added option to show mentions
 
 = 2.6.0 =
 Fix lists and add ability to remove accounts, as well as plenty of minor bug fixes.
