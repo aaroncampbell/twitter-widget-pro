@@ -1094,8 +1094,8 @@ class wpTwitterWidget extends RangePlugin {
 	private function _getTweets( $widgetOptions ) {
 		$key = 'twp_' . md5( maybe_serialize( $this->_get_feed_request_settings( $widgetOptions ) ) );
 		return tlc_transient( $key )
-			->expires_in( 1 ) // cache for 5 minutes / 300
-			->extend_on_fail( 1 ) // On a failed call, don't try again for 2 minutes, 120
+			->expires_in( 300 ) // cache for 5 minutes
+			->extend_on_fail( 120 ) // On a failed call, don't try again for 2 minutes
 			->updates_with( array( $this, 'parseFeed' ), array( $widgetOptions ) )
 			->get();
 	}
