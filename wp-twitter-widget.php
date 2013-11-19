@@ -970,13 +970,13 @@ class wpTwitterWidget extends RangePlugin {
 				}
 				if ( !empty( $tweet->in_reply_to_screen_name ) ) {
 					$rtLinkText = sprintf( __( 'in reply to %s', $this->_slug ), $tweet->in_reply_to_screen_name );
-					$widgetContent .=  ' <span class="in-reply-to-meta">';
 					$linkAttrs = array(
 						'href'	=> "http://twitter.com/{$tweet->in_reply_to_screen_name}/statuses/{$tweet->in_reply_to_status_id_str}",
 						'class'	=> 'reply-to'
 					);
-					$widgetContent .= $this->_buildLink( $rtLinkText, $linkAttrs );
-					$widgetContent .= '</span>';
+					$replyToLink = $this->_buildLink( $rtLinkText, $linkAttrs );
+					$replyToContent =  ' <span class="in-reply-to-meta">' . $replyToLink . '</span>';
+					$widgetContent .= apply_filters( 'in_reply_to_content', $replyToContent, $tweet, $replyToLink );
 				}
  				$widgetContent .= '</span>';
 
