@@ -976,6 +976,13 @@ class wpTwitterWidget extends RangePlugin {
 					);
 					$replyToLink = $this->_buildLink( $rtLinkText, $linkAttrs );
 					$replyToContent =  ' <span class="in-reply-to-meta">' . $replyToLink . '</span>';
+					/**
+					 * The content of the "In Reply To" text after the tweet content.
+					 *
+					 * @param string $replyToContent The content of "In Reply To".
+					 * @param object $tweet The current tweet object.
+					 * @param $replyToLink The formatted reply to link and default text.
+					 */
 					$widgetContent .= apply_filters( 'in_reply_to_content', $replyToContent, $tweet, $replyToLink );
 				}
  				$widgetContent .= '</span>';
