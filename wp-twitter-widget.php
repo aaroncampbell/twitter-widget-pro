@@ -957,12 +957,20 @@ class wpTwitterWidget extends RangePlugin {
 				$widgetContent .= '<li>';
 				$widgetContent .= "<span class='entry-content'>{$entryContent}</span>";
 				$widgetContent .= " <span class='entry-meta'>";
-				$widgetContent .= "<span class='time-meta'>";
 				$linkAttrs = array(
 					'href'	=> "http://twitter.com/{$tweet->user->screen_name}/statuses/{$tweet->id_str}"
 				);
-				$widgetContent .= $this->_buildLink( $tweet->ago, $linkAttrs );
-				$widgetContent .= '</span>';
+				$timeLink = $this->_buildLink( $tweet->ago, $linkAttrs );
+				$timeContent = '<span class="time-meta">' . $timeLink . '</span>';
+				/**
+				 * The content of the Time displayed after the tweet content
+				 *
+				 * @param string $timeContent The content of Time display.
+				 * @param object $tweet The current tweet object.
+				 * @param $timeLink The formatted time to link and default text.
+				 * @param $tweet->ago The time string converted to "# ___(s) ago"
+				 */
+				$widgetContent .= apply_filters( 'tweet_time_content', $timeContent, $tweet, $timeLink, $tweet->ago );
 
 				if ( 'true' != $args['hidefrom'] ) {
 					$from = sprintf( __( 'from %s', $this->_slug ), str_replace( '&', '&amp;', $tweet->source ) );
