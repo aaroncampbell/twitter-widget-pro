@@ -272,6 +272,8 @@ class wpTwitterWidget extends RangePlugin {
 		add_action( 'admin_init', array( $this, 'handle_actions' ) );
 		add_action( 'admin_notices', array( $this, 'show_messages' ) );
 		add_action( 'widgets_init', array( $this, 'register' ), 11 );
+		add_action('wp_ajax_twitter_widget_pro_fetch', array( $this, 'display_fetch_via_ajax' ) );
+		add_action('wp_ajax_nopriv_twitter_widget_pro_fetch', array( $this, 'display_fetch_via_ajax' ) );
 		add_filter( 'widget_twitter_content', array( $this, 'linkTwitterUsers' ) );
 		add_filter( 'widget_twitter_content', array( $this, 'linkUrls' ) );
 		add_filter( 'widget_twitter_content', array( $this, 'linkHashtags' ) );
@@ -914,6 +916,33 @@ class wpTwitterWidget extends RangePlugin {
 		return $attributes;
 	}
 
+	public function display_for_ajax( $args ) {
+		$args = wp_parse_args( $args );
+
+		$uniq_id = $this->_slug . '_' . wp_create_nonce('twitter-widget-pro');
+
+		$output = sprintf( '<div id="%1$s">%2$s</div>',
+			$uniq_id,
+			$this->_getTitle( $args )
+		);
+		
+		// 
+		$output .= sprintf("<script>\n
+				jQuery.post('/wp-admin/admin-ajax.php', {
+					action: 'twitter_widget_pro_fetch', 
+					settings: %s
+				}, function(res) {
+					jQuery('#%s').html(res);
+				})
+			</script>", json_encode( $args ), $uniq_id );
+		return $output;
+	}
+
+	public function display_fetch_via_ajax() {
+		echo $this->display( $_POST['settings'] );
+		exit;
+	}
+
 	public function display( $args ) {
 		$args = wp_parse_args( $args );
 
@@ -1053,6 +1082,17 @@ class wpTwitterWidget extends RangePlugin {
 			}
 		}
 		return $widgetContent;
+	}
+
+	private function _getTitle( $args ) {
+
+		if ( empty( $args['title'] ) )
+			$args['title'] = sprintf( __( 'Twitter: %s', $this->_slug ), $args['username'] );
+
+		$args['title'] = apply_filters( 'twitter-widget-title', $args['title'], $args );
+		$args['title'] = "<span class='twitterwidget twitterwidget-title'>{$args['title']}</span>";
+
+		return $args['before_title'] . $args['title'] . $args['after_title'];
 	}
 
 	private function _getTwitterLang() {
@@ -1262,6 +1302,7 @@ class wpTwitterWidget extends RangePlugin {
 			'items'           => 10,
 			'showts'          => 60 * 60 * 24,
 			'dateFormat'      => __( 'h:i:s A F d, Y', $this->_slug ),
+			'ajax'            => false
 		);
 
 		/**
@@ -1310,6 +1351,10 @@ class wpTwitterWidget extends RangePlugin {
 
 		if ( $attr['targetBlank'] && $attr['targetBlank'] != 'false' && $attr['targetBlank'] != '0' )
 			$attr['targetBlank'] = 'true';
+
+		if ( array_key_exists('ajax', $attr ) && $attr['ajax'] === 'true' ) {
+			return $this->display_for_ajax( $attr );
+		}
 
 		return $this->display( $attr );
 	}
