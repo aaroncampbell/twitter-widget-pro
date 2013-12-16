@@ -963,12 +963,8 @@ class wpTwitterWidget extends RangePlugin {
 
 		$widgetContent = $args['before_widget'] . '<div>';
 
-		if ( empty( $args['title'] ) )
-			$args['title'] = sprintf( __( 'Twitter: %s', $this->_slug ), $args['username'] );
+		$widgetContent .= $this->_getTitle( $args );
 
-		$args['title'] = apply_filters( 'twitter-widget-title', $args['title'], $args );
-		$args['title'] = "<span class='twitterwidget twitterwidget-title'>{$args['title']}</span>";
-		$widgetContent .= $args['before_title'] . $args['title'] . $args['after_title'];
 		if ( !empty( $tweets[0] ) && is_object( $tweets[0] ) && !empty( $args['avatar'] ) ) {
 			$widgetContent .= '<div class="twitter-avatar">';
 			$widgetContent .= $this->_getProfileImage( $tweets[0]->user, $args );
