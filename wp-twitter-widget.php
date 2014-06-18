@@ -3,7 +3,7 @@
  * Plugin Name: Twitter Widget Pro
  * Plugin URI: http://bluedogwebservices.com/wordpress-plugin/twitter-widget-pro/
  * Description: A widget that properly handles twitter feeds, including @username, #hashtag, and link parsing.  It can even display profile images for the users.  Requires PHP5.
- * Version: 2.6.1-alpha
+ * Version: 2.6.1
  * Author: Aaron D. Campbell
  * Author URI: http://ran.ge/
  * License: GPLv2 or later
@@ -30,7 +30,7 @@
 
 require_once( 'tlc-transients.php' );
 require_once( 'range-plugin-framework.php' );
-define( 'TWP_VERSION', '2.6.0' );
+define( 'TWP_VERSION', '2.6.1' );
 
 /**
  * WP_Widget_Twitter_Pro is the class that handles the main widget.
@@ -142,6 +142,11 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showretweets' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showretweets' ); ?>" name="<?php echo $this->get_field_name( 'showretweets' ); ?>"<?php checked( $instance['showretweets'], 'true' ); ?> />
 				<label for="<?php echo $this->get_field_id( 'showretweets' ); ?>"><?php _e( 'Include retweets', $this->_slug ); ?></label>
+			</p>
+			<p>
+				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showmentions' ); ?>" />
+				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showmentions' ); ?>" name="<?php echo $this->get_field_name( 'showmentions' ); ?>"<?php checked( $instance['showmentions'], 'true' ); ?> />
+				<label for="<?php echo $this->get_field_id( 'showmentions' ); ?>"><?php _e( 'Include mentions', $this->_slug ); ?></label>
 			</p>
 			<p>
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'hidereplies' ); ?>" />
@@ -736,6 +741,10 @@ class wpTwitterWidget extends RangePlugin {
 							<input class="checkbox" type="checkbox" value="true" id="twp_showretweets" name="twp[showretweets]"<?php checked( $this->_settings['twp']['showretweets'], 'true' ); ?> />
 							<label for="twp_showretweets"><?php _e( 'Include retweets', $this->_slug ); ?></label>
 							<br />
+							<input type="hidden" value="false" name="twp[showmentions]" />
+							<input class="checkbox" type="checkbox" value="true" id="twp_showmentions" name="twp[showmentions]"<?php checked( $this->_settings['twp']['showmentions'], 'true' ); ?> />
+							<label for="twp_showmentions"><?php _e( 'Include mentions', $this->_slug ); ?></label>
+							<br />
 							<input type="hidden" value="false" name="twp[hidereplies]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_hidereplies" name="twp[hidereplies]"<?php checked( $this->_settings['twp']['hidereplies'], 'true' ); ?> />
 							<label for="twp_hidereplies"><?php _e( 'Hide @replies', $this->_slug ); ?></label>
@@ -1099,7 +1108,7 @@ class wpTwitterWidget extends RangePlugin {
 	 */
 	public function parseFeed( $widgetOptions ) {
 		$parameters = $this->_get_feed_request_settings( $widgetOptions );
-		$response = array();
+		$response = $user_timeline = $mentions_timeline = $merged_timeline = array();
 
 		if ( ! empty( $parameters['screen_name'] ) ) {
 			if ( empty( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] ) ) {
@@ -1107,9 +1116,18 @@ class wpTwitterWidget extends RangePlugin {
 					$widgetOptions['errmsg'] = __( 'Account needs to be authorized', $this->_slug );
 			} else {
 				$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] );
-				$response = $this->_wp_twitter_oauth->send_authed_request( 'statuses/user_timeline', 'GET', $parameters );
-				if ( ! is_wp_error( $response ) )
-					return $response;
+				$user_timeline = $this->_wp_twitter_oauth->send_authed_request( 'statuses/user_timeline', 'GET', $parameters );
+				if ( 'true' == $widgetOptions['showmentions'] ) {
+					$mentions_timeline = $this->_wp_twitter_oauth->send_authed_request( 'statuses/mentions_timeline', 'GET', $parameters );
+					if ( ! is_wp_error( $user_timeline ) && ! is_wp_error( $mentions_timeline )) {
+						$merged_timeline = array_merge_recursive($user_timeline,$mentions_timeline);
+						if (usort($merged_timeline,array($this,"_created_at_compare"))) {
+							return $merged_timeline;
+						}
+					}
+				} else if ( ! is_wp_error( $user_timeline ) ) {
+						return $user_timeline;
+				}
 			}
 		} elseif ( ! empty( $parameters['list_id'] ) ) {
 			$list_info = explode( '::', $widgetOptions['list'] );
@@ -1125,6 +1143,22 @@ class wpTwitterWidget extends RangePlugin {
 			$widgetOptions['errmsg'] = __( 'Invalid Twitter Response.', $this->_slug );
 		do_action( 'widget_twitter_parsefeed_error', $response, $parameters, $widgetOptions );
 		throw new Exception( $widgetOptions['errmsg'] );
+	}
+
+	/**
+	 * Helper function used by usort in parseFeed to sort JSON feed, decending, by date (newest first)
+	 * @param  array $a 
+	 * @param  array $b 
+	 * @return int    
+	 */
+    private function _created_at_compare($a, $b) {
+	    $acreated = strtotime($a->created_at);
+	    $bcreated = strtotime($b->created_at);
+	    
+	    if ($acreated == $bcreated) {
+		     return 0;
+	    }
+	    return ($acreated > $bcreated) ? -1 : 1;    
 	}
 
 	/**
@@ -1253,6 +1287,7 @@ class wpTwitterWidget extends RangePlugin {
 			'list'            => '',
 			'hidereplies'     => 'false',
 			'showretweets'    => 'true',
+			'showmentions'    => 'false',
 			'hidefrom'        => 'false',
 			'showintents'     => 'true',
 			'showfollow'      => 'true',
@@ -1293,6 +1328,9 @@ class wpTwitterWidget extends RangePlugin {
 		if ( $attr['showretweets'] && $attr['showretweets'] != 'false' && $attr['showretweets'] != '0' )
 			$attr['showretweets'] = 'true';
 
+		if ( $attr['showmentions'] && $attr['showmentions'] != 'false' && $attr['showmentions'] != '0' )
+			$attr['showmentions'] = 'true';
+
 		if ( $attr['hidefrom'] && $attr['hidefrom'] != 'false' && $attr['hidefrom'] != '0' )
 			$attr['hidefrom'] = 'true';
 
@@ -1331,6 +1369,7 @@ class wpTwitterWidget extends RangePlugin {
 			'http_vs_https'   => 'https',
 			'hidereplies'     => 'false',
 			'showretweets'    => 'true',
+			'showmentions'    => 'false',
 			'hidefrom'        => 'false',
 			'showintents'     => 'true',
 			'showfollow'      => 'true',

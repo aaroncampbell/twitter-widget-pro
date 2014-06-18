@@ -56,6 +56,7 @@ However, there are more things you can control.
 * dateFormat - The format for dates (defaults to'h:i:s A F d, Y' or it's localization)
 * title - The title of the widget (defaults to 'Twitter: Username')
 * showretweets - set to true to show retweets, false to hide them (defaults to true)
+* showmentions - set to true to show mentions, false to hide them (defaults to false)
 * showintents - set to true to show the reply, retweet, and favorite links for each tweet, false to hide them (defaults to true)
 * showfollow - set to true to show the follow button after tweets, false to hide it (defaults to true)
 
@@ -119,6 +120,9 @@ There are plenty of CSS classes throughout the HTML that is generated, and you c
 Aparently the database queries required to display the friends feed was causing twitter to crash, so they removed it.  Unfortunately, this is outside my control.
 
 ## Changelog
+
+### 2.6.1
+* Added option to show mentions
 
 ### 2.6.0
 * Add ability to remove accounts
