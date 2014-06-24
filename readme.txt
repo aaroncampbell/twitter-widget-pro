@@ -45,6 +45,9 @@ However, there are more things you can control.
 * list - A Twitter list id owned by one of the users you've authenticated.
 * before_widget - This is inserted before the widget.
 * after_widget - This is inserted after the widget, and is often used to close tags opened in before_widget
+* before_twp - This gets inserted after before_widget but before widget content used for additional wrappers if needed
+* after_twp - inserted immediately before after_widget, often used to close tags opened in before_twp
+* addclass  - if set, adds a CSS Class to the wiget's wrapping div
 * before_title - This is inserted before the title and defults to <h2>
 * after_title - This is inserted after the title and defults to </h2>
 * errmsg - This is the error message that displays if there's a problem connecting to Twitter
@@ -62,6 +65,7 @@ However, there are more things you can control.
 * showretweets - set to true to show retweets, false to hide them (defaults to true)
 * showintents - set to true to show the reply, retweet, and favorite links for each tweet, false to hide them (defaults to true)
 * showfollow - set to true to show the follow button after tweets, false to hide it (defaults to true)
+* followposition - Displays the follow button before or after tweets if showfollow is true, 'top' shows before, 'bottom' shows after (defaults to 'bottom') 
 
 You can see these put into action by trying something like:
 
