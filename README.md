@@ -120,6 +120,12 @@ Aparently the database queries required to display the friends feed was causing 
 
 ## Changelog
 
+### 2.7.0
+* Use __contrsuct instead of WP_Widget->WP_Widget
+* Move away from Range
+* Ability to test loop back requests...consider this beta :)
+* Removes even opt-in credit link
+
 ### 2.6.0
 * Add ability to remove accounts
 * Fix bug that made lists not work
