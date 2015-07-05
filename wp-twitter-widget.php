@@ -36,7 +36,7 @@ define( 'TWP_VERSION', '2.6.0' );
  * WP_Widget_Twitter_Pro is the class that handles the main widget.
  */
 class WP_Widget_Twitter_Pro extends WP_Widget {
-	public function WP_Widget_Twitter_Pro () {
+	public function __construct () {
 		$this->_slug = 'twitter-widget-pro';
 		$wpTwitterWidget = wpTwitterWidget::getInstance();
 		$widget_ops = array(
@@ -50,7 +50,7 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 		);
 		$name = __( 'Twitter Widget Pro', $wpTwitterWidget->get_slug() );
 
-		$this->WP_Widget( 'twitter', $name, $widget_ops, $control_ops );
+		parent::__construct( 'twitter', $name, $widget_ops, $control_ops );
 	}
 
 	private function _getInstanceSettings ( $instance ) {
@@ -263,7 +263,6 @@ class wpTwitterWidget extends AaronPlugin {
 		 * Add filters and actions
 		 */
 		add_action( 'init', array( $this, 'init' ) );
-		add_filter( 'nonce_user_logged_out', array( $this, 'nonce_user_logged_out' ), null, 2 );
 		add_action( 'admin_init', array( $this, 'handle_actions' ) );
 		add_action( 'admin_notices', array( $this, 'show_messages' ) );
 		add_action( 'widgets_init', array( $this, 'register' ), 11 );
@@ -567,9 +566,9 @@ class wpTwitterWidget extends AaronPlugin {
 								check_admin_referer( 'test-local-request' );
 
 								$server_url = home_url( '/?twp-test-local-request' );
-								$resp = wp_remote_post( $server_url, array( 'body' => array( '_wpnonce' => wp_create_nonce( 'twp-test-local-request' ), 'uid' => get_current_user_id() ), 'sslverify' => apply_filters( 'https_local_ssl_verify', true ) ) );
+								$resp = wp_remote_post( $server_url, array( 'body' => array( '_twp-test-local-request' => 'test' ), 'sslverify' => apply_filters( 'https_local_ssl_verify', true ) ) );
 								if ( !is_wp_error( $resp ) && $resp['response']['code'] >= 200 && $resp['response']['code'] < 300 ) {
-									if ( 'success' == wp_remote_retrieve_body( $resp ) )
+									if ( 'success' === wp_remote_retrieve_body( $resp ) )
 										_e( '<p style="color:green;">Local requests appear to be functioning normally.</p>', $this->_slug );
 									else
 										_e( '<p style="color:red;">The request went through, but an unexpected response was received.</p>', $this->_slug );
@@ -1369,15 +1368,11 @@ class wpTwitterWidget extends AaronPlugin {
 	}
 
 	public function init() {
-		if ( isset( $_GET['twp-test-local-request'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'twp-test-local-request' ) )
+		if ( isset( $_GET['twp-test-local-request'] ) && ! empty( $_POST['_twp-test-local-request'] ) && 'test' === $_POST['_twp-test-local-request'] ) {
 			die( 'success' );
+		}
 	}
 
-	public function nonce_user_logged_out( $uid, $action ) {
-		if ( 'twp-test-local-request' == $action && isset( $_POST['uid'] ) )
-			$uid = absint( $_POST['uid'] );
-		return $uid;
-	}
 }
 // Instantiate our class
 $wpTwitterWidget = wpTwitterWidget::getInstance();
