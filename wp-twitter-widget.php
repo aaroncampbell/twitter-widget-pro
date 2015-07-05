@@ -1,11 +1,11 @@
 <?php
 /**
  * Plugin Name: Twitter Widget Pro
- * Plugin URI: http://bluedogwebservices.com/wordpress-plugin/twitter-widget-pro/
+ * Plugin URI: https://aarondcampbell.com/wordpress-plugin/twitter-widget-pro/
  * Description: A widget that properly handles twitter feeds, including @username, #hashtag, and link parsing.  It can even display profile images for the users.  Requires PHP5.
  * Version: 2.6.1-alpha
  * Author: Aaron D. Campbell
- * Author URI: http://ran.ge/
+ * Author URI: https://aarondcampbell.com/
  * License: GPLv2 or later
  * Text Domain: twitter-widget-pro
  */
@@ -29,7 +29,7 @@
 */
 
 require_once( 'tlc-transients.php' );
-require_once( 'range-plugin-framework.php' );
+require_once( 'aaron-plugin-framework.php' );
 define( 'TWP_VERSION', '2.6.0' );
 
 /**
@@ -234,7 +234,7 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
  * includes filters that modify tweet content for things like linked usernames.
  * It also helps us avoid name collisions.
  */
-class wpTwitterWidget extends RangePlugin {
+class wpTwitterWidget extends AaronPlugin {
 	/**
 	 * @var wpTwitter
 	 */
@@ -408,9 +408,9 @@ class wpTwitterWidget extends RangePlugin {
 	}
 
 	public function add_options_meta_boxes() {
-		add_meta_box( $this->_slug . '-oauth', __( 'Authenticated Twitter Accounts', $this->_slug ), array( $this, 'oauth_meta_box' ), 'range-' . $this->_slug, 'main' );
-		add_meta_box( $this->_slug . '-general-settings', __( 'General Settings', $this->_slug ), array( $this, 'general_settings_meta_box' ), 'range-' . $this->_slug, 'main' );
-		add_meta_box( $this->_slug . '-defaults', __( 'Default Settings for Shortcodes', $this->_slug ), array( $this, 'default_settings_meta_box' ), 'range-' . $this->_slug, 'main' );
+		add_meta_box( $this->_slug . '-oauth', __( 'Authenticated Twitter Accounts', $this->_slug ), array( $this, 'oauth_meta_box' ), 'aaron-' . $this->_slug, 'main' );
+		add_meta_box( $this->_slug . '-general-settings', __( 'General Settings', $this->_slug ), array( $this, 'general_settings_meta_box' ), 'aaron-' . $this->_slug, 'main' );
+		add_meta_box( $this->_slug . '-defaults', __( 'Default Settings for Shortcodes', $this->_slug ), array( $this, 'default_settings_meta_box' ), 'aaron-' . $this->_slug, 'main' );
 	}
 
 	public function oauth_meta_box() {
