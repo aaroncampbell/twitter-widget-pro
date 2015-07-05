@@ -188,11 +188,6 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'targetBlank' ); ?>" name="<?php echo $this->get_field_name( 'targetBlank' ); ?>"<?php checked( $instance['targetBlank'], 'true' ); ?> />
 				<label for="<?php echo $this->get_field_id( 'targetBlank' ); ?>"><?php _e( 'Open links in a new window', $this->_slug ); ?></label>
 			</p>
-			<p>
-				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showXavisysLink' ); ?>" />
-				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showXavisysLink' ); ?>" name="<?php echo $this->get_field_name( 'showXavisysLink' ); ?>"<?php checked( $instance['showXavisysLink'], 'true' ); ?> />
-				<label for="<?php echo $this->get_field_id( 'showXavisysLink' ); ?>"><?php _e( 'Show Link to Twitter Widget Pro', $this->_slug ); ?></label>
-			</p>
 			<p><?php echo $wpTwitterWidget->get_support_forum_link(); ?></p>
 			<script type="text/javascript">
 				jQuery( '#<?php echo $this->get_field_id( 'username' ) ?>' ).on( 'change', function() {
@@ -755,10 +750,6 @@ class wpTwitterWidget extends RangePlugin {
 							<input type="hidden" value="false" name="twp[targetBlank]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_targetBlank" name="twp[targetBlank]"<?php checked( $this->_settings['twp']['targetBlank'], 'true' ); ?> />
 							<label for="twp_targetBlank"><?php _e( 'Open links in a new window', $this->_slug ); ?></label>
-							<br />
-							<input type="hidden" value="false" name="twp[showXavisysLink" />
-							<input class="checkbox" type="checkbox" value="true" id="twp_showXavisysLink" name="twp[showXavisysLink]"<?php checked( $this->_settings['twp']['showXavisysLink'], 'true' ); ?> />
-							<label for="twp_showXavisysLink"><?php _e( 'Show Link to Twitter Widget Pro', $this->_slug ); ?></label>
 						</td>
 					</tr>
 				</table>
@@ -1029,16 +1020,6 @@ class wpTwitterWidget extends RangePlugin {
 			$widgetContent .= '</div>';
 		}
 
-		if ( 'true' == $args['showXavisysLink'] ) {
-			$widgetContent .= '<div class="range-link"><span class="range-link-text">';
-			$linkAttrs = array(
-				'href'	=> 'http://bluedogwebservices.com/wordpress-plugin/twitter-widget-pro/',
-				'title'	=> __( 'Brought to you by Range - A WordPress design and development company', $this->_slug )
-			);
-			$widgetContent .= __( 'Powered by', $this->_slug );
-			$widgetContent .= $this->_buildLink( 'WordPress Twitter Widget Pro', $linkAttrs );
-			$widgetContent .= '</span></div>';
-		}
 		$widgetContent .= '</div>' . $args['after_widget'];
 
 		if ( 'true' == $args['showintents'] || 'true' == $args['showfollow'] ) {
@@ -1257,7 +1238,6 @@ class wpTwitterWidget extends RangePlugin {
 			'showintents'     => 'true',
 			'showfollow'      => 'true',
 			'avatar'          => '',
-			'showXavisysLink' => 'false',
 			'targetBlank'     => 'false',
 			'items'           => 10,
 			'showts'          => 60 * 60 * 24,
@@ -1268,10 +1248,6 @@ class wpTwitterWidget extends RangePlugin {
 		 * Attribute names are strtolower'd, so we need to fix them to match
 		 * the names used through the rest of the plugin
 		 */
-		if ( array_key_exists( 'showxavisyslink', $attr ) ) {
-			$attr['showXavisysLink'] = $attr['showxavisyslink'];
-			unset( $attr['showxavisyslink'] );
-		}
 		if ( array_key_exists( 'targetblank', $attr ) ) {
 			$attr['targetBlank'] = $attr['targetblank'];
 			unset( $attr['targetblank'] );
@@ -1305,9 +1281,6 @@ class wpTwitterWidget extends RangePlugin {
 		if ( !in_array( $attr['avatar'], array( 'bigger', 'normal', 'mini', 'original', '' ) ) )
 			$attr['avatar'] = 'normal';
 
-		if ( $attr['showXavisysLink'] && $attr['showXavisysLink'] != 'false' && $attr['showXavisysLink'] != '0' )
-			$attr['showXavisysLink'] = 'true';
-
 		if ( $attr['targetBlank'] && $attr['targetBlank'] != 'false' && $attr['targetBlank'] != '0' )
 			$attr['targetBlank'] = 'true';
 
@@ -1335,7 +1308,6 @@ class wpTwitterWidget extends RangePlugin {
 			'showintents'     => 'true',
 			'showfollow'      => 'true',
 			'avatar'          => '',
-			'showXavisysLink' => 'false',
 			'targetBlank'     => 'false',
 			'items'           => 10,
 			'showts'          => 60 * 60 * 24,
