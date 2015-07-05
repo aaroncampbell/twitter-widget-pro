@@ -947,12 +947,20 @@ class wpTwitterWidget extends AaronPlugin {
 				$widgetContent .= '<li>';
 				$widgetContent .= "<span class='entry-content'>{$entryContent}</span>";
 				$widgetContent .= " <span class='entry-meta'>";
-				$widgetContent .= "<span class='time-meta'>";
 				$linkAttrs = array(
 					'href'	=> "http://twitter.com/{$tweet->user->screen_name}/statuses/{$tweet->id_str}"
 				);
-				$widgetContent .= $this->_buildLink( $tweet->ago, $linkAttrs );
-				$widgetContent .= '</span>';
+				$timeLink = $this->_buildLink( $tweet->ago, $linkAttrs );
+				$timeContent = '<span class="time-meta">' . $timeLink . '</span>';
+				/**
+				 * The content of the Time displayed after the tweet content
+				 *
+				 * @param string $timeContent The content of Time display.
+				 * @param object $tweet The current tweet object.
+				 * @param $timeLink The formatted time to link and default text.
+				 * @param $tweet->ago The time string converted to "# ___(s) ago"
+				 */
+				$widgetContent .= apply_filters( 'tweet_time_content', $timeContent, $tweet, $timeLink, $tweet->ago );
 
 				if ( 'true' != $args['hidefrom'] ) {
 					$from = sprintf( __( 'from %s', $this->_slug ), str_replace( '&', '&amp;', $tweet->source ) );
@@ -960,13 +968,20 @@ class wpTwitterWidget extends AaronPlugin {
 				}
 				if ( !empty( $tweet->in_reply_to_screen_name ) ) {
 					$rtLinkText = sprintf( __( 'in reply to %s', $this->_slug ), $tweet->in_reply_to_screen_name );
-					$widgetContent .=  ' <span class="in-reply-to-meta">';
 					$linkAttrs = array(
 						'href'	=> "http://twitter.com/{$tweet->in_reply_to_screen_name}/statuses/{$tweet->in_reply_to_status_id_str}",
 						'class'	=> 'reply-to'
 					);
-					$widgetContent .= $this->_buildLink( $rtLinkText, $linkAttrs );
-					$widgetContent .= '</span>';
+					$replyToLink = $this->_buildLink( $rtLinkText, $linkAttrs );
+					$replyToContent =  ' <span class="in-reply-to-meta">' . $replyToLink . '</span>';
+					/**
+					 * The content of the "In Reply To" text after the tweet content.
+					 *
+					 * @param string $replyToContent The content of "In Reply To".
+					 * @param object $tweet The current tweet object.
+					 * @param $replyToLink The formatted reply to link and default text.
+					 */
+					$widgetContent .= apply_filters( 'in_reply_to_content', $replyToContent, $tweet, $replyToLink );
 				}
  				$widgetContent .= '</span>';
 
