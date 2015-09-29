@@ -37,18 +37,17 @@ define( 'TWP_VERSION', '2.7.0' );
  */
 class WP_Widget_Twitter_Pro extends WP_Widget {
 	public function __construct () {
-		$this->_slug = 'twitter-widget-pro';
 		$wpTwitterWidget = wpTwitterWidget::getInstance();
 		$widget_ops = array(
 			'classname' => 'widget_twitter',
-			'description' => __( 'Follow a Twitter Feed', $wpTwitterWidget->get_slug() )
+			'description' => __( 'Follow a Twitter Feed', 'twitter-widget-pro' )
 		);
 		$control_ops = array(
 			'width' => 400,
 			'height' => 350,
 			'id_base' => 'twitter'
 		);
-		$name = __( 'Twitter Widget Pro', $wpTwitterWidget->get_slug() );
+		$name = __( 'Twitter Widget Pro', 'twitter-widget-pro' );
 
 		parent::__construct( 'twitter', $name, $widget_ops, $control_ops );
 	}
@@ -66,7 +65,7 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 
 ?>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'username' ); ?>"><?php _e( 'Twitter username:', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'username' ); ?>"><?php _e( 'Twitter username:', 'twitter-widget-pro' ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'username' ); ?>" name="<?php echo $this->get_field_name( 'username' ); ?>">
 					<option></option>
 					<?php
@@ -82,7 +81,7 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				</select>
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'list' ); ?>"><?php _e( 'Twitter list:', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'list' ); ?>"><?php _e( 'Twitter list:', 'twitter-widget-pro' ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'list' ); ?>" name="<?php echo $this->get_field_name( 'list' ); ?>">
 					<option></option>
 					<?php
@@ -108,18 +107,18 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				?>
 			<p>
 				<a href="<?php echo esc_url( $authorize_user_url ); ?>" style="color:red;">
-					<?php _e( 'You need to authorize this account.', $this->_slug ); ?>
+					<?php _e( 'You need to authorize this account.', 'twitter-widget-pro' ); ?>
 				</a>
 			</p>
 				<?php
 			}
 			?>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Give the feed a title ( optional ):', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'title' ); ?>"><?php _e( 'Give the feed a title ( optional ):', 'twitter-widget-pro' ); ?></label>
 				<input class="widefat" id="<?php echo $this->get_field_id( 'title' ); ?>" name="<?php echo $this->get_field_name( 'title' ); ?>" type="text" value="<?php esc_attr_e( $instance['title'] ); ?>" />
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'items' ); ?>"><?php _e( 'How many items would you like to display?', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'items' ); ?>"><?php _e( 'How many items would you like to display?', 'twitter-widget-pro' ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'items' ); ?>" name="<?php echo $this->get_field_name( 'items' ); ?>">
 					<?php
 						for ( $i = 1; $i <= 20; ++$i ) {
@@ -129,64 +128,64 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				</select>
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'avatar' ); ?>"><?php _e( 'Display profile image?', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'avatar' ); ?>"><?php _e( 'Display profile image?', 'twitter-widget-pro' ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'avatar' ); ?>" name="<?php echo $this->get_field_name( 'avatar' ); ?>">
-					<option value=""<?php selected( $instance['avatar'], '' ) ?>><?php _e( 'Do not show', $this->_slug ); ?></option>
-					<option value="mini"<?php selected( $instance['avatar'], 'mini' ) ?>><?php _e( 'Mini - 24px by 24px', $this->_slug ); ?></option>
-					<option value="normal"<?php selected( $instance['avatar'], 'normal' ) ?>><?php _e( 'Normal - 48px by 48px', $this->_slug ); ?></option>
-					<option value="bigger"<?php selected( $instance['avatar'], 'bigger' ) ?>><?php _e( 'Bigger - 73px by 73px', $this->_slug ); ?></option>
-					<option value="original"<?php selected( $instance['avatar'], 'original' ) ?>><?php _e( 'Original', $this->_slug ); ?></option>
+					<option value=""<?php selected( $instance['avatar'], '' ) ?>><?php _e( 'Do not show', 'twitter-widget-pro' ); ?></option>
+					<option value="mini"<?php selected( $instance['avatar'], 'mini' ) ?>><?php _e( 'Mini - 24px by 24px', 'twitter-widget-pro' ); ?></option>
+					<option value="normal"<?php selected( $instance['avatar'], 'normal' ) ?>><?php _e( 'Normal - 48px by 48px', 'twitter-widget-pro' ); ?></option>
+					<option value="bigger"<?php selected( $instance['avatar'], 'bigger' ) ?>><?php _e( 'Bigger - 73px by 73px', 'twitter-widget-pro' ); ?></option>
+					<option value="original"<?php selected( $instance['avatar'], 'original' ) ?>><?php _e( 'Original', 'twitter-widget-pro' ); ?></option>
 				</select>
 			</p>
 			<p>
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showretweets' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showretweets' ); ?>" name="<?php echo $this->get_field_name( 'showretweets' ); ?>"<?php checked( $instance['showretweets'], 'true' ); ?> />
-				<label for="<?php echo $this->get_field_id( 'showretweets' ); ?>"><?php _e( 'Include retweets', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'showretweets' ); ?>"><?php _e( 'Include retweets', 'twitter-widget-pro' ); ?></label>
 			</p>
 			<p>
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'hidereplies' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'hidereplies' ); ?>" name="<?php echo $this->get_field_name( 'hidereplies' ); ?>"<?php checked( $instance['hidereplies'], 'true' ); ?> />
-				<label for="<?php echo $this->get_field_id( 'hidereplies' ); ?>"><?php _e( 'Hide @replies', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'hidereplies' ); ?>"><?php _e( 'Hide @replies', 'twitter-widget-pro' ); ?></label>
 			</p>
 			<p>
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'hidefrom' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'hidefrom' ); ?>" name="<?php echo $this->get_field_name( 'hidefrom' ); ?>"<?php checked( $instance['hidefrom'], 'true' ); ?> />
-				<label for="<?php echo $this->get_field_id( 'hidefrom' ); ?>"><?php _e( 'Hide sending applications', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'hidefrom' ); ?>"><?php _e( 'Hide sending applications', 'twitter-widget-pro' ); ?></label>
 			</p>
 			<p>
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showintents' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showintents' ); ?>" name="<?php echo $this->get_field_name( 'showintents' ); ?>"<?php checked( $instance['showintents'], 'true' ); ?> />
-				<label for="<?php echo $this->get_field_id( 'showintents' ); ?>"><?php _e( 'Show Tweet Intents (reply, retweet, favorite)', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'showintents' ); ?>"><?php _e( 'Show Tweet Intents (reply, retweet, favorite)', 'twitter-widget-pro' ); ?></label>
 			</p>
 			<p>
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'showfollow' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'showfollow' ); ?>" name="<?php echo $this->get_field_name( 'showfollow' ); ?>"<?php checked( $instance['showfollow'], 'true' ); ?> />
-				<label for="<?php echo $this->get_field_id( 'showfollow' ); ?>"><?php _e( 'Show Follow Link', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'showfollow' ); ?>"><?php _e( 'Show Follow Link', 'twitter-widget-pro' ); ?></label>
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'errmsg' ); ?>"><?php _e( 'What to display when Twitter is down ( optional ):', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'errmsg' ); ?>"><?php _e( 'What to display when Twitter is down ( optional ):', 'twitter-widget-pro' ); ?></label>
 				<input class="widefat" id="<?php echo $this->get_field_id( 'errmsg' ); ?>" name="<?php echo $this->get_field_name( 'errmsg' ); ?>" type="text" value="<?php esc_attr_e( $instance['errmsg'] ); ?>" />
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'showts' ); ?>"><?php _e( 'Show date/time of Tweet ( rather than 2 ____ ago ):', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'showts' ); ?>"><?php _e( 'Show date/time of Tweet ( rather than 2 ____ ago ):', 'twitter-widget-pro' ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'showts' ); ?>" name="<?php echo $this->get_field_name( 'showts' ); ?>">
-					<option value="0" <?php selected( $instance['showts'], '0' ); ?>><?php _e( 'Always', $this->_slug );?></option>
-					<option value="3600" <?php selected( $instance['showts'], '3600' ); ?>><?php _e( 'If over an hour old', $this->_slug );?></option>
-					<option value="86400" <?php selected( $instance['showts'], '86400' ); ?>><?php _e( 'If over a day old', $this->_slug );?></option>
-					<option value="604800" <?php selected( $instance['showts'], '604800' ); ?>><?php _e( 'If over a week old', $this->_slug );?></option>
-					<option value="2592000" <?php selected( $instance['showts'], '2592000' ); ?>><?php _e( 'If over a month old', $this->_slug );?></option>
-					<option value="31536000" <?php selected( $instance['showts'], '31536000' ); ?>><?php _e( 'If over a year old', $this->_slug );?></option>
-					<option value="-1" <?php selected( $instance['showts'], '-1' ); ?>><?php _e( 'Never', $this->_slug );?></option>
+					<option value="0" <?php selected( $instance['showts'], '0' ); ?>><?php _e( 'Always', 'twitter-widget-pro' );?></option>
+					<option value="3600" <?php selected( $instance['showts'], '3600' ); ?>><?php _e( 'If over an hour old', 'twitter-widget-pro' );?></option>
+					<option value="86400" <?php selected( $instance['showts'], '86400' ); ?>><?php _e( 'If over a day old', 'twitter-widget-pro' );?></option>
+					<option value="604800" <?php selected( $instance['showts'], '604800' ); ?>><?php _e( 'If over a week old', 'twitter-widget-pro' );?></option>
+					<option value="2592000" <?php selected( $instance['showts'], '2592000' ); ?>><?php _e( 'If over a month old', 'twitter-widget-pro' );?></option>
+					<option value="31536000" <?php selected( $instance['showts'], '31536000' ); ?>><?php _e( 'If over a year old', 'twitter-widget-pro' );?></option>
+					<option value="-1" <?php selected( $instance['showts'], '-1' ); ?>><?php _e( 'Never', 'twitter-widget-pro' );?></option>
 				</select>
 			</p>
 			<p>
-				<label for="<?php echo $this->get_field_id( 'dateFormat' ); ?>"><?php echo sprintf( __( 'Format to display the date in, uses <a href="%s">PHP date()</a> format:', $this->_slug ), 'http://php.net/date' ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'dateFormat' ); ?>"><?php echo sprintf( __( 'Format to display the date in, uses <a href="%s">PHP date()</a> format:', 'twitter-widget-pro' ), 'http://php.net/date' ); ?></label>
 				<input class="widefat" id="<?php echo $this->get_field_id( 'dateFormat' ); ?>" name="<?php echo $this->get_field_name( 'dateFormat' ); ?>" type="text" value="<?php esc_attr_e( $instance['dateFormat'] ); ?>" />
 			</p>
 			<p>
 				<input type="hidden" value="false" name="<?php echo $this->get_field_name( 'targetBlank' ); ?>" />
 				<input class="checkbox" type="checkbox" value="true" id="<?php echo $this->get_field_id( 'targetBlank' ); ?>" name="<?php echo $this->get_field_name( 'targetBlank' ); ?>"<?php checked( $instance['targetBlank'], 'true' ); ?> />
-				<label for="<?php echo $this->get_field_id( 'targetBlank' ); ?>"><?php _e( 'Open links in a new window', $this->_slug ); ?></label>
+				<label for="<?php echo $this->get_field_id( 'targetBlank' ); ?>"><?php _e( 'Open links in a new window', 'twitter-widget-pro' ); ?></label>
 			</p>
 			<p><?php echo $wpTwitterWidget->get_support_forum_link(); ?></p>
 			<script type="text/javascript">
@@ -250,13 +249,12 @@ class wpTwitterWidget extends AaronPlugin {
 
 		$this->_hook = 'twitterWidgetPro';
 		$this->_file = plugin_basename( __FILE__ );
-		$this->_pageTitle = __( 'Twitter Widget Pro', $this->_slug );
-		$this->_menuTitle = __( 'Twitter Widget', $this->_slug );
+		$this->_pageTitle = __( 'Twitter Widget Pro', 'twitter-widget-pro' );
+		$this->_menuTitle = __( 'Twitter Widget', 'twitter-widget-pro' );
 		$this->_accessLevel = 'manage_options';
 		$this->_optionGroup = 'twp-options';
 		$this->_optionNames = array( 'twp' );
 		$this->_optionCallbacks = array();
-		$this->_slug = 'twitter-widget-pro';
 		$this->_paypalButtonId = '9993090';
 
 		/**
@@ -270,8 +268,8 @@ class wpTwitterWidget extends AaronPlugin {
 		add_filter( 'widget_twitter_content', array( $this, 'linkUrls' ) );
 		add_filter( 'widget_twitter_content', array( $this, 'linkHashtags' ) );
 		add_filter( 'widget_twitter_content', 'convert_chars' );
-		add_filter( $this->_slug .'-opt-twp', array( $this, 'filterSettings' ) );
-		add_filter( $this->_slug .'-opt-twp-authed-users', array( $this, 'authed_users_option' ) );
+		add_filter( 'twitter-widget-pro-opt-twp', array( $this, 'filterSettings' ) );
+		add_filter( 'twitter-widget-pro-opt-twp-authed-users', array( $this, 'authed_users_option' ) );
 		add_shortcode( 'twitter-widget', array( $this, 'handleShortcodes' ) );
 
 		$twp_version = get_option( 'twp_version' );
@@ -287,7 +285,7 @@ class wpTwitterWidget extends AaronPlugin {
 		$this->_wp_twitter_oauth = new wpTwitter( $oauth_settings );
 
 		// We want to fill 'twp-authed-users' but not overwrite them when saving
-		$this->_settings['twp-authed-users'] = apply_filters($this->_slug.'-opt-twp-authed-users', get_option('twp-authed-users'));
+		$this->_settings['twp-authed-users'] = apply_filters('twitter-widget-pro-opt-twp-authed-users', get_option('twp-authed-users'));
 	}
 
 	/**
@@ -298,10 +296,6 @@ class wpTwitterWidget extends AaronPlugin {
 			self::$instance = new self;
 
 		return self::$instance;
-	}
-
-	public function get_slug() {
-		return $this->_slug;
 	}
 
 	public function handle_actions() {
@@ -372,19 +366,19 @@ class wpTwitterWidget extends AaronPlugin {
 		if ( ! empty( $_GET['message'] ) ) {
 			if ( 'clear-locks' == $_GET['message'] ) {
 				if ( empty( $_GET['locks_cleared'] ) || 0 == $_GET['locks_cleared'] )
-					$msg = __( 'There were no locks to clear!', $this->_slug );
+					$msg = __( 'There were no locks to clear!', 'twitter-widget-pro' );
 				else
-					$msg = sprintf( _n( 'Successfully cleared %d lock.', 'Successfully cleared %d locks.', $_GET['locks_cleared'], $this->_slug ), $_GET['locks_cleared'] );
+					$msg = sprintf( _n( 'Successfully cleared %d lock.', 'Successfully cleared %d locks.', $_GET['locks_cleared'], 'twitter-widget-pro' ), $_GET['locks_cleared'] );
 			} elseif ( 'authorized' == $_GET['message'] ) {
 				if ( ! empty( $_GET['authorized'] ) )
-					$msg = sprintf( __( 'Successfully authorized @%s', $this->_slug ), $_GET['authorized'] );
+					$msg = sprintf( __( 'Successfully authorized @%s', 'twitter-widget-pro' ), $_GET['authorized'] );
 				else
-					$msg = __( 'There was a problem authorizing your account.', $this->_slug );
+					$msg = __( 'There was a problem authorizing your account.', 'twitter-widget-pro' );
 			} elseif ( 'removed' == $_GET['message'] ) {
 				if ( ! empty( $_GET['removed'] ) )
-					$msg = sprintf( __( 'Successfully removed @%s', $this->_slug ), $_GET['removed'] );
+					$msg = sprintf( __( 'Successfully removed @%s', 'twitter-widget-pro' ), $_GET['removed'] );
 				else
-					$msg = __( 'There was a problem removing your account.', $this->_slug );
+					$msg = __( 'There was a problem removing your account.', 'twitter-widget-pro' );
 			}
 			if ( ! empty( $msg ) )
 				echo "<div class='updated'><p>" . esc_html( $msg ) . '</p></div>';
@@ -396,20 +390,20 @@ class wpTwitterWidget extends AaronPlugin {
 		}
 
 		if ( empty( $this->_settings['twp']['consumer-key'] ) || empty( $this->_settings['twp']['consumer-secret'] ) ) {
-			$msg = sprintf( __( 'You need to <a href="%s">set up your Twitter app keys</a>.', $this->_slug ), $this->get_options_url() );
+			$msg = sprintf( __( 'You need to <a href="%s">set up your Twitter app keys</a>.', 'twitter-widget-pro' ), $this->get_options_url() );
 			echo '<div class="error"><p>' . $msg . '</p></div>';
 		}
 
 		if ( empty( $this->_settings['twp-authed-users'] ) ) {
-			$msg = sprintf( __( 'You need to <a href="%s">authorize your Twitter accounts</a>.', $this->_slug ), $this->get_options_url() );
+			$msg = sprintf( __( 'You need to <a href="%s">authorize your Twitter accounts</a>.', 'twitter-widget-pro' ), $this->get_options_url() );
 			echo '<div class="error"><p>' . $msg . '</p></div>';
 		}
 	}
 
 	public function add_options_meta_boxes() {
-		add_meta_box( $this->_slug . '-oauth', __( 'Authenticated Twitter Accounts', $this->_slug ), array( $this, 'oauth_meta_box' ), 'aaron-' . $this->_slug, 'main' );
-		add_meta_box( $this->_slug . '-general-settings', __( 'General Settings', $this->_slug ), array( $this, 'general_settings_meta_box' ), 'aaron-' . $this->_slug, 'main' );
-		add_meta_box( $this->_slug . '-defaults', __( 'Default Settings for Shortcodes', $this->_slug ), array( $this, 'default_settings_meta_box' ), 'aaron-' . $this->_slug, 'main' );
+		add_meta_box( 'twitter-widget-pro-oauth', __( 'Authenticated Twitter Accounts', 'twitter-widget-pro' ), array( $this, 'oauth_meta_box' ), 'aaron-twitter-widget-pro', 'main' );
+		add_meta_box( 'twitter-widget-pro-general-settings', __( 'General Settings', 'twitter-widget-pro' ), array( $this, 'general_settings_meta_box' ), 'aaron-twitter-widget-pro', 'main' );
+		add_meta_box( 'twitter-widget-pro-defaults', __( 'Default Settings for Shortcodes', 'twitter-widget-pro' ), array( $this, 'default_settings_meta_box' ), 'aaron-twitter-widget-pro', 'main' );
 	}
 
 	public function oauth_meta_box() {
@@ -420,13 +414,13 @@ class wpTwitterWidget extends AaronPlugin {
 			<thead>
 				<tr valign="top">
 					<th scope="row">
-						<?php _e( 'Username', $this->_slug );?>
+						<?php _e( 'Username', 'twitter-widget-pro' );?>
 					</th>
 					<th scope="row">
-						<?php _e( 'Lists Rate Usage', $this->_slug );?>
+						<?php _e( 'Lists Rate Usage', 'twitter-widget-pro' );?>
 					</th>
 					<th scope="row">
-						<?php _e( 'Statuses Rate Usage', $this->_slug );?>
+						<?php _e( 'Statuses Rate Usage', 'twitter-widget-pro' );?>
 					</th>
 				</tr>
 			</thead>
@@ -442,7 +436,7 @@ class wpTwitterWidget extends AaronPlugin {
 				);
 				$authorize_user_url = wp_nonce_url( add_query_arg( $query_args ), 'authorize' );
 				$style = 'color:red;';
-				$auth_link = ' - <a href="' . esc_url( $authorize_user_url ) . '">' . __( 'Reauthorize', $this->_slug ) . '</a>';
+				$auth_link = ' - <a href="' . esc_url( $authorize_user_url ) . '">' . __( 'Reauthorize', 'twitter-widget-pro' ) . '</a>';
 			}
 			$query_args = array(
 				'action' => 'remove',
@@ -453,26 +447,26 @@ class wpTwitterWidget extends AaronPlugin {
 				<tr valign="top">
 					<th scope="row" style="<?php echo esc_attr( $style ); ?>">
 						<strong>@<?php echo esc_html( $u['screen_name'] ) . $auth_link;?></strong>
-						<br /><a href="<?php echo esc_url( $remove_user_url ) ?>"><?php _e( 'Remove', $this->_slug ) ?></a>
+						<br /><a href="<?php echo esc_url( $remove_user_url ) ?>"><?php _e( 'Remove', 'twitter-widget-pro' ) ?></a>
 					</th>
 					<?php
 					if ( ! is_wp_error( $rates ) ) {
 						$display_rates = array(
-							__( 'Lists', $this->_slug ) => $rates->resources->lists->{'/lists/statuses'},
-							__( 'Statuses', $this->_slug ) => $rates->resources->statuses->{'/statuses/user_timeline'},
+							__( 'Lists', 'twitter-widget-pro' ) => $rates->resources->lists->{'/lists/statuses'},
+							__( 'Statuses', 'twitter-widget-pro' ) => $rates->resources->statuses->{'/statuses/user_timeline'},
 						);
 						foreach ( $display_rates as $title => $rate ) {
 						?>
 						<td>
 							<strong><?php echo esc_html( $title ); ?></strong>
 							<p>
-								<?php echo sprintf( __( 'Used: %d', $this->_slug ), $rate->limit - $rate->remaining ); ?><br />
-								<?php echo sprintf( __( 'Remaining: %d', $this->_slug ), $rate->remaining ); ?><br />
+								<?php echo sprintf( __( 'Used: %d', 'twitter-widget-pro' ), $rate->limit - $rate->remaining ); ?><br />
+								<?php echo sprintf( __( 'Remaining: %d', 'twitter-widget-pro' ), $rate->remaining ); ?><br />
 								<?php
 								$minutes = ceil( ( $rate->reset - gmdate( 'U' ) ) / 60 );
-								echo sprintf( _n( 'Limits reset in: %d minutes', 'Limits reset in: %d minutes', $minutes, $this->_slug ), $minutes );
+								echo sprintf( _n( 'Limits reset in: %d minutes', 'Limits reset in: %d minutes', $minutes, 'twitter-widget-pro' ), $minutes );
 								?><br />
-								<small><?php _e( 'This is overall usage, not just usage from Twitter Widget Pro', $this->_slug ); ?></small>
+								<small><?php _e( 'This is overall usage, not just usage from Twitter Widget Pro', 'twitter-widget-pro' ); ?></small>
 							</p>
 						</td>
 						<?php
@@ -480,10 +474,10 @@ class wpTwitterWidget extends AaronPlugin {
 					} else {
 						?>
 						<td>
-							<p><?php _e( 'There was an error checking your rate limit.', $this->_slug ); ?></p>
+							<p><?php _e( 'There was an error checking your rate limit.', 'twitter-widget-pro' ); ?></p>
 						</td>
 						<td>
-							<p><?php _e( 'There was an error checking your rate limit.', $this->_slug ); ?></p>
+							<p><?php _e( 'There was an error checking your rate limit.', 'twitter-widget-pro' ); ?></p>
 						</td>
 						<?php
 					}
@@ -497,13 +491,13 @@ class wpTwitterWidget extends AaronPlugin {
 		if ( empty( $this->_settings['twp']['consumer-key'] ) || empty( $this->_settings['twp']['consumer-secret'] ) ) {
 		?>
 		<p>
-			<strong><?php _e( 'You need to fill in the Consumer key and Consumer secret before you can authorize accounts.', $this->_slug ) ?></strong>
+			<strong><?php _e( 'You need to fill in the Consumer key and Consumer secret before you can authorize accounts.', 'twitter-widget-pro' ) ?></strong>
 		</p>
 		<?php
 		} else {
 		?>
 		<p>
-			<a href="<?php echo esc_url( $authorize_url );?>" class="button button-large button-primary"><?php _e( 'Authorize New Account', $this->_slug ); ?></a>
+			<a href="<?php echo esc_url( $authorize_url );?>" class="button button-large button-primary"><?php _e( 'Authorize New Account', 'twitter-widget-pro' ); ?></a>
 		</p>
 		<?php
 		}
@@ -514,7 +508,7 @@ class wpTwitterWidget extends AaronPlugin {
 				<table class="form-table">
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_consumer_key"><?php _e( 'Consumer key', $this->_slug );?></label>
+							<label for="twp_consumer_key"><?php _e( 'Consumer key', 'twitter-widget-pro' );?></label>
 						</th>
 						<td>
 							<input id="twp_consumer_key" name="twp[consumer-key]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['consumer-key'] ); ?>" size="40" />
@@ -522,7 +516,7 @@ class wpTwitterWidget extends AaronPlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_consumer_secret"><?php _e( 'Consumer secret', $this->_slug );?></label>
+							<label for="twp_consumer_secret"><?php _e( 'Consumer secret', 'twitter-widget-pro' );?></label>
 						</th>
 						<td>
 							<input id="twp_consumer_secret" name="twp[consumer-secret]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['consumer-secret'] ); ?>" size="40" />
@@ -534,9 +528,9 @@ class wpTwitterWidget extends AaronPlugin {
 					<tr valign="top">
 						<th scope="row">&nbsp;</th>
 						<td>
-							<strong><?php _e( 'Directions to get the Consumer Key and Consumer Secret', $this->_slug ) ?></strong>
+							<strong><?php _e( 'Directions to get the Consumer Key and Consumer Secret', 'twitter-widget-pro' ) ?></strong>
 							<ol>
-								<li><a href="https://dev.twitter.com/apps/new"><?php _e( 'Add a new Twitter application', $this->_slug ) ?></a></li>
+								<li><a href="https://dev.twitter.com/apps/new"><?php _e( 'Add a new Twitter application', 'twitter-widget-pro' ) ?></a></li>
 								<li><?php _e( "Fill in Name, Description, Website, and Callback URL (don't leave any blank) with anything you want" ) ?></a></li>
 								<li><?php _e( "Agree to rules, fill out captcha, and submit your application" ) ?></a></li>
 								<li><?php _e( "Copy the Consumer key and Consumer secret into the fields above" ) ?></a></li>
@@ -549,16 +543,16 @@ class wpTwitterWidget extends AaronPlugin {
 					?>
 					<tr>
 						<th scope="row">
-							<?php _e( "Clear Update Locks", $this->_slug );?>
+							<?php _e( "Clear Update Locks", 'twitter-widget-pro' );?>
 						</th>
 						<td>
-							<a href="<?php echo esc_url( $clear_locks_url ); ?>"><?php _e( 'Clear Update Locks', $this->_slug ); ?></a><br />
-							<small><?php _e( "A small percentage of servers seem to have issues where an update lock isn't getting cleared.  If you're experiencing issues with your feed not updating, try clearing the update locks.", $this->_slug ); ?></small>
+							<a href="<?php echo esc_url( $clear_locks_url ); ?>"><?php _e( 'Clear Update Locks', 'twitter-widget-pro' ); ?></a><br />
+							<small><?php _e( "A small percentage of servers seem to have issues where an update lock isn't getting cleared.  If you're experiencing issues with your feed not updating, try clearing the update locks.", 'twitter-widget-pro' ); ?></small>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row">
-							<?php _e( 'Local requests:', $this->_slug ); ?>
+							<?php _e( 'Local requests:', 'twitter-widget-pro' ); ?>
 						</th>
 						<td>
 						<?php
@@ -569,11 +563,11 @@ class wpTwitterWidget extends AaronPlugin {
 								$resp = wp_remote_post( $server_url, array( 'body' => array( '_twp-test-local-request' => 'test' ), 'sslverify' => apply_filters( 'https_local_ssl_verify', true ) ) );
 								if ( !is_wp_error( $resp ) && $resp['response']['code'] >= 200 && $resp['response']['code'] < 300 ) {
 									if ( 'success' === wp_remote_retrieve_body( $resp ) )
-										_e( '<p style="color:green;">Local requests appear to be functioning normally.</p>', $this->_slug );
+										_e( '<p style="color:green;">Local requests appear to be functioning normally.</p>', 'twitter-widget-pro' );
 									else
-										_e( '<p style="color:red;">The request went through, but an unexpected response was received.</p>', $this->_slug );
+										_e( '<p style="color:red;">The request went through, but an unexpected response was received.</p>', 'twitter-widget-pro' );
 								} else {
-									printf( __( '<p style="color:red;">Failed.  Your server said: %s</p>', $this->_slug ), $resp['response']['message'] );
+									printf( __( '<p style="color:red;">Failed.  Your server said: %s</p>', 'twitter-widget-pro' ), $resp['response']['message'] );
 								}
 							}
 							$query_args = array(
@@ -582,9 +576,9 @@ class wpTwitterWidget extends AaronPlugin {
 							$test_local_url = wp_nonce_url( add_query_arg( $query_args, $this->get_options_url() ), 'test-local-request' );
 							?>
 							<a href="<?php echo esc_url( $test_local_url ); ?>" class="button">
-								<?php _e( 'Test local requests', $this->_slug ); ?>
+								<?php _e( 'Test local requests', 'twitter-widget-pro' ); ?>
 							</a><br />
-							<small><?php _e( "Twitter Widget Pro updates tweets in the background by placing a local request to your server.  If your Tweets aren't updating, test this.  If it fails, let your host know that loopback requests aren't working on your site.", $this->_slug ); ?></small>
+							<small><?php _e( "Twitter Widget Pro updates tweets in the background by placing a local request to your server.  If your Tweets aren't updating, test this.  If it fails, let your host know that loopback requests aren't working on your site.", 'twitter-widget-pro' ); ?></small>
 						</td>
 					</tr>
 				</table>
@@ -594,11 +588,11 @@ class wpTwitterWidget extends AaronPlugin {
 		$users = $this->get_users_list( true );
 		$lists = $this->get_lists();
 		?>
-				<p><?php _e( 'These settings are the default for the shortcodes and all of them can be overridden by specifying a different value in the shortcode itself.  All settings for widgets are locate in the individual widget.', $this->_slug ) ?></p>
+				<p><?php _e( 'These settings are the default for the shortcodes and all of them can be overridden by specifying a different value in the shortcode itself.  All settings for widgets are locate in the individual widget.', 'twitter-widget-pro' ) ?></p>
 				<table class="form-table">
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_username"><?php _e( 'Twitter username:', $this->_slug ); ?></label>
+							<label for="twp_username"><?php _e( 'Twitter username:', 'twitter-widget-pro' ); ?></label>
 						</th>
 						<td>
 							<select id="twp_username" name="twp[username]">
@@ -624,7 +618,7 @@ class wpTwitterWidget extends AaronPlugin {
 								?>
 							<p>
 								<a href="<?php echo esc_url( $authorize_user_url ); ?>" style="color:red;">
-									<?php _e( 'You need to authorize this account.', $this->_slug ); ?>
+									<?php _e( 'You need to authorize this account.', 'twitter-widget-pro' ); ?>
 								</a>
 							</p>
 								<?php
@@ -634,7 +628,7 @@ class wpTwitterWidget extends AaronPlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_list"><?php _e( 'Twitter list:', $this->_slug ); ?></label>
+							<label for="twp_list"><?php _e( 'Twitter list:', 'twitter-widget-pro' ); ?></label>
 						</th>
 						<td>
 							<select id="twp_list" name="twp[list]">
@@ -655,7 +649,7 @@ class wpTwitterWidget extends AaronPlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_title"><?php _e( 'Give the feed a title ( optional ):', $this->_slug ); ?></label>
+							<label for="twp_title"><?php _e( 'Give the feed a title ( optional ):', 'twitter-widget-pro' ); ?></label>
 						</th>
 						<td>
 							<input id="twp_title" name="twp[title]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['title'] ); ?>" size="40" />
@@ -663,7 +657,7 @@ class wpTwitterWidget extends AaronPlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_items"><?php _e( 'How many items would you like to display?', $this->_slug ); ?></label>
+							<label for="twp_items"><?php _e( 'How many items would you like to display?', 'twitter-widget-pro' ); ?></label>
 						</th>
 						<td>
 							<select id="twp_items" name="twp[items]">
@@ -677,21 +671,21 @@ class wpTwitterWidget extends AaronPlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_avatar"><?php _e( 'Display profile image?', $this->_slug ); ?></label>
+							<label for="twp_avatar"><?php _e( 'Display profile image?', 'twitter-widget-pro' ); ?></label>
 						</th>
 						<td>
 							<select id="twp_avatar" name="twp[avatar]">
-								<option value=""<?php selected( $this->_settings['twp']['avatar'], '' ) ?>><?php _e( 'Do not show', $this->_slug ); ?></option>
-								<option value="mini"<?php selected( $this->_settings['twp']['avatar'], 'mini' ) ?>><?php _e( 'Mini - 24px by 24px', $this->_slug ); ?></option>
-								<option value="normal"<?php selected( $this->_settings['twp']['avatar'], 'normal' ) ?>><?php _e( 'Normal - 48px by 48px', $this->_slug ); ?></option>
-								<option value="bigger"<?php selected( $this->_settings['twp']['avatar'], 'bigger' ) ?>><?php _e( 'Bigger - 73px by 73px', $this->_slug ); ?></option>
-								<option value="original"<?php selected( $this->_settings['twp']['avatar'], 'original' ) ?>><?php _e( 'Original', $this->_slug ); ?></option>
+								<option value=""<?php selected( $this->_settings['twp']['avatar'], '' ) ?>><?php _e( 'Do not show', 'twitter-widget-pro' ); ?></option>
+								<option value="mini"<?php selected( $this->_settings['twp']['avatar'], 'mini' ) ?>><?php _e( 'Mini - 24px by 24px', 'twitter-widget-pro' ); ?></option>
+								<option value="normal"<?php selected( $this->_settings['twp']['avatar'], 'normal' ) ?>><?php _e( 'Normal - 48px by 48px', 'twitter-widget-pro' ); ?></option>
+								<option value="bigger"<?php selected( $this->_settings['twp']['avatar'], 'bigger' ) ?>><?php _e( 'Bigger - 73px by 73px', 'twitter-widget-pro' ); ?></option>
+								<option value="original"<?php selected( $this->_settings['twp']['avatar'], 'original' ) ?>><?php _e( 'Original', 'twitter-widget-pro' ); ?></option>
 							</select>
 						</td>
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_errmsg"><?php _e( 'What to display when Twitter is down ( optional ):', $this->_slug ); ?></label>
+							<label for="twp_errmsg"><?php _e( 'What to display when Twitter is down ( optional ):', 'twitter-widget-pro' ); ?></label>
 						</th>
 						<td>
 							<input id="twp_errmsg" name="twp[errmsg]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['errmsg'] ); ?>" size="40" />
@@ -699,23 +693,23 @@ class wpTwitterWidget extends AaronPlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_showts"><?php _e( 'Show date/time of Tweet ( rather than 2 ____ ago ):', $this->_slug ); ?></label>
+							<label for="twp_showts"><?php _e( 'Show date/time of Tweet ( rather than 2 ____ ago ):', 'twitter-widget-pro' ); ?></label>
 						</th>
 						<td>
 							<select id="twp_showts" name="twp[showts]">
-								<option value="0" <?php selected( $this->_settings['twp']['showts'], '0' ); ?>><?php _e( 'Always', $this->_slug );?></option>
-								<option value="3600" <?php selected( $this->_settings['twp']['showts'], '3600' ); ?>><?php _e( 'If over an hour old', $this->_slug );?></option>
-								<option value="86400" <?php selected( $this->_settings['twp']['showts'], '86400' ); ?>><?php _e( 'If over a day old', $this->_slug );?></option>
-								<option value="604800" <?php selected( $this->_settings['twp']['showts'], '604800' ); ?>><?php _e( 'If over a week old', $this->_slug );?></option>
-								<option value="2592000" <?php selected( $this->_settings['twp']['showts'], '2592000' ); ?>><?php _e( 'If over a month old', $this->_slug );?></option>
-								<option value="31536000" <?php selected( $this->_settings['twp']['showts'], '31536000' ); ?>><?php _e( 'If over a year old', $this->_slug );?></option>
-								<option value="-1" <?php selected( $this->_settings['twp']['showts'], '-1' ); ?>><?php _e( 'Never', $this->_slug );?></option>
+								<option value="0" <?php selected( $this->_settings['twp']['showts'], '0' ); ?>><?php _e( 'Always', 'twitter-widget-pro' );?></option>
+								<option value="3600" <?php selected( $this->_settings['twp']['showts'], '3600' ); ?>><?php _e( 'If over an hour old', 'twitter-widget-pro' );?></option>
+								<option value="86400" <?php selected( $this->_settings['twp']['showts'], '86400' ); ?>><?php _e( 'If over a day old', 'twitter-widget-pro' );?></option>
+								<option value="604800" <?php selected( $this->_settings['twp']['showts'], '604800' ); ?>><?php _e( 'If over a week old', 'twitter-widget-pro' );?></option>
+								<option value="2592000" <?php selected( $this->_settings['twp']['showts'], '2592000' ); ?>><?php _e( 'If over a month old', 'twitter-widget-pro' );?></option>
+								<option value="31536000" <?php selected( $this->_settings['twp']['showts'], '31536000' ); ?>><?php _e( 'If over a year old', 'twitter-widget-pro' );?></option>
+								<option value="-1" <?php selected( $this->_settings['twp']['showts'], '-1' ); ?>><?php _e( 'Never', 'twitter-widget-pro' );?></option>
 							</select>
 						</td>
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_dateFormat"><?php echo sprintf( __( 'Format to display the date in, uses <a href="%s">PHP date()</a> format:', $this->_slug ), 'http://php.net/date' ); ?></label>
+							<label for="twp_dateFormat"><?php echo sprintf( __( 'Format to display the date in, uses <a href="%s">PHP date()</a> format:', 'twitter-widget-pro' ), 'http://php.net/date' ); ?></label>
 						</th>
 						<td>
 							<input id="twp_dateFormat" name="twp[dateFormat]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['dateFormat'] ); ?>" size="40" />
@@ -723,32 +717,32 @@ class wpTwitterWidget extends AaronPlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<?php _e( "Other Setting:", $this->_slug );?>
+							<?php _e( "Other Setting:", 'twitter-widget-pro' );?>
 						</th>
 						<td>
 							<input type="hidden" value="false" name="twp[showretweets]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_showretweets" name="twp[showretweets]"<?php checked( $this->_settings['twp']['showretweets'], 'true' ); ?> />
-							<label for="twp_showretweets"><?php _e( 'Include retweets', $this->_slug ); ?></label>
+							<label for="twp_showretweets"><?php _e( 'Include retweets', 'twitter-widget-pro' ); ?></label>
 							<br />
 							<input type="hidden" value="false" name="twp[hidereplies]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_hidereplies" name="twp[hidereplies]"<?php checked( $this->_settings['twp']['hidereplies'], 'true' ); ?> />
-							<label for="twp_hidereplies"><?php _e( 'Hide @replies', $this->_slug ); ?></label>
+							<label for="twp_hidereplies"><?php _e( 'Hide @replies', 'twitter-widget-pro' ); ?></label>
 							<br />
 							<input type="hidden" value="false" name="twp[hidefrom]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_hidefrom" name="twp[hidefrom]"<?php checked( $this->_settings['twp']['hidefrom'], 'true' ); ?> />
-							<label for="twp_hidefrom"><?php _e( 'Hide sending applications', $this->_slug ); ?></label>
+							<label for="twp_hidefrom"><?php _e( 'Hide sending applications', 'twitter-widget-pro' ); ?></label>
 							<br />
 							<input type="hidden" value="false" name="twp[showintents]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_showintents" name="twp[showintents]"<?php checked( $this->_settings['twp']['showintents'], 'true' ); ?> />
-							<label for="twp_showintents"><?php _e( 'Show Tweet Intents (reply, retweet, favorite)', $this->_slug ); ?></label>
+							<label for="twp_showintents"><?php _e( 'Show Tweet Intents (reply, retweet, favorite)', 'twitter-widget-pro' ); ?></label>
 							<br />
 							<input type="hidden" value="false" name="twp[showfollow]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_showfollow" name="twp[showfollow]"<?php checked( $this->_settings['twp']['showfollow'], 'true' ); ?> />
-							<label for="twp_showfollow"><?php _e( 'Show Follow Link', $this->_slug ); ?></label>
+							<label for="twp_showfollow"><?php _e( 'Show Follow Link', 'twitter-widget-pro' ); ?></label>
 							<br />
 							<input type="hidden" value="false" name="twp[targetBlank]" />
 							<input class="checkbox" type="checkbox" value="true" id="twp_targetBlank" name="twp[targetBlank]"<?php checked( $this->_settings['twp']['targetBlank'], 'true' ); ?> />
-							<label for="twp_targetBlank"><?php _e( 'Open links in a new window', $this->_slug ); ?></label>
+							<label for="twp_targetBlank"><?php _e( 'Open links in a new window', 'twitter-widget-pro' ); ?></label>
 						</td>
 					</tr>
 				</table>
@@ -925,7 +919,7 @@ class wpTwitterWidget extends AaronPlugin {
 		$widgetContent = $args['before_widget'] . '<div>';
 
 		if ( empty( $args['title'] ) )
-			$args['title'] = sprintf( __( 'Twitter: %s', $this->_slug ), $args['username'] );
+			$args['title'] = sprintf( __( 'Twitter: %s', 'twitter-widget-pro' ), $args['username'] );
 
 		$args['title'] = apply_filters( 'twitter-widget-title', $args['title'], $args );
 		$args['title'] = "<span class='twitterwidget twitterwidget-title'>{$args['title']}</span>";
@@ -937,7 +931,7 @@ class wpTwitterWidget extends AaronPlugin {
 		}
 		$widgetContent .= '<ul>';
 		if ( ! is_array( $tweets ) || count( $tweets ) == 0 ) {
-			$widgetContent .= '<li class="wpTwitterWidgetEmpty">' . __( 'No Tweets Available', $this->_slug ) . '</li>';
+			$widgetContent .= '<li class="wpTwitterWidgetEmpty">' . __( 'No Tweets Available', 'twitter-widget-pro' ) . '</li>';
 		} else {
 			$count = 0;
 			foreach ( $tweets as $tweet ) {
@@ -955,11 +949,11 @@ class wpTwitterWidget extends AaronPlugin {
 				$widgetContent .= '</span>';
 
 				if ( 'true' != $args['hidefrom'] ) {
-					$from = sprintf( __( 'from %s', $this->_slug ), str_replace( '&', '&amp;', $tweet->source ) );
+					$from = sprintf( __( 'from %s', 'twitter-widget-pro' ), str_replace( '&', '&amp;', $tweet->source ) );
 					$widgetContent .= " <span class='from-meta'>{$from}</span>";
 				}
 				if ( !empty( $tweet->in_reply_to_screen_name ) ) {
-					$rtLinkText = sprintf( __( 'in reply to %s', $this->_slug ), $tweet->in_reply_to_screen_name );
+					$rtLinkText = sprintf( __( 'in reply to %s', 'twitter-widget-pro' ), $tweet->in_reply_to_screen_name );
 					$widgetContent .=  ' <span class="in-reply-to-meta">';
 					$linkAttrs = array(
 						'href'	=> "http://twitter.com/{$tweet->in_reply_to_screen_name}/statuses/{$tweet->in_reply_to_status_id_str}",
@@ -976,19 +970,19 @@ class wpTwitterWidget extends AaronPlugin {
 					if ( !empty( $lang ) )
 						$linkAttrs['data-lang'] = $lang;
 
-					$linkText = __( 'Reply', $this->_slug );
+					$linkText = __( 'Reply', 'twitter-widget-pro' );
 					$linkAttrs['href'] = "http://twitter.com/intent/tweet?in_reply_to={$tweet->id_str}";
 					$linkAttrs['class'] = 'in-reply-to';
 					$linkAttrs['title'] = $linkText;
 					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
 
-					$linkText = __( 'Retweet', $this->_slug );
+					$linkText = __( 'Retweet', 'twitter-widget-pro' );
 					$linkAttrs['href'] = "http://twitter.com/intent/retweet?tweet_id={$tweet->id_str}";
 					$linkAttrs['class'] = 'retweet';
 					$linkAttrs['title'] = $linkText;
 					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
 
-					$linkText = __( 'Favorite', $this->_slug );
+					$linkText = __( 'Favorite', 'twitter-widget-pro' );
 					$linkAttrs['href'] = "http://twitter.com/intent/favorite?tweet_id={$tweet->id_str}";
 					$linkAttrs['class'] = 'favorite';
 					$linkAttrs['title'] = $linkText;
@@ -1009,7 +1003,7 @@ class wpTwitterWidget extends AaronPlugin {
 			$linkAttrs = array(
 				'href'	=> "http://twitter.com/{$args['username']}",
 				'class'	=> 'twitter-follow-button',
-				'title'	=> sprintf( __( 'Follow %s', $this->_slug ), "@{$args['username']}" ),
+				'title'	=> sprintf( __( 'Follow %s', 'twitter-widget-pro' ), "@{$args['username']}" ),
 			);
 			$lang = $this->_getTwitterLang();
 			if ( !empty( $lang ) )
@@ -1084,7 +1078,7 @@ class wpTwitterWidget extends AaronPlugin {
 		if ( ! empty( $parameters['screen_name'] ) ) {
 			if ( empty( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] ) ) {
 				if ( empty( $widgetOptions['errmsg'] ) )
-					$widgetOptions['errmsg'] = __( 'Account needs to be authorized', $this->_slug );
+					$widgetOptions['errmsg'] = __( 'Account needs to be authorized', 'twitter-widget-pro' );
 			} else {
 				$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] );
 				$response = $this->_wp_twitter_oauth->send_authed_request( 'statuses/user_timeline', 'GET', $parameters );
@@ -1102,7 +1096,7 @@ class wpTwitterWidget extends AaronPlugin {
 		}
 
 		if ( empty( $widgetOptions['errmsg'] ) )
-			$widgetOptions['errmsg'] = __( 'Invalid Twitter Response.', $this->_slug );
+			$widgetOptions['errmsg'] = __( 'Invalid Twitter Response.', 'twitter-widget-pro' );
 		do_action( 'widget_twitter_parsefeed_error', $response, $parameters, $widgetOptions );
 		throw new Exception( $widgetOptions['errmsg'] );
 	}
@@ -1184,13 +1178,13 @@ class wpTwitterWidget extends AaronPlugin {
 		}
 
 		$messages = array(
-			'year'   => _n( 'about %s year ago',   'about %s years ago',   $count, $this->_slug ),
-			'month'  => _n( 'about %s month ago',  'about %s months ago',  $count, $this->_slug ),
-			'week'   => _n( 'about %s week ago',   'about %s weeks ago',   $count, $this->_slug ),
-			'day'    => _n( 'about %s day ago',    'about %s days ago',    $count, $this->_slug ),
-			'hour'   => _n( 'about %s hour ago',   'about %s hours ago',   $count, $this->_slug ),
-			'minute' => _n( 'about %s minute ago', 'about %s minutes ago', $count, $this->_slug ),
-			'second' => _n( 'about %s second ago', 'about %s seconds ago', $count, $this->_slug ),
+			'year'   => _n( 'about %s year ago',   'about %s years ago',   $count, 'twitter-widget-pro' ),
+			'month'  => _n( 'about %s month ago',  'about %s months ago',  $count, 'twitter-widget-pro' ),
+			'week'   => _n( 'about %s week ago',   'about %s weeks ago',   $count, 'twitter-widget-pro' ),
+			'day'    => _n( 'about %s day ago',    'about %s days ago',    $count, 'twitter-widget-pro' ),
+			'hour'   => _n( 'about %s hour ago',   'about %s hours ago',   $count, 'twitter-widget-pro' ),
+			'minute' => _n( 'about %s minute ago', 'about %s minutes ago', $count, 'twitter-widget-pro' ),
+			'second' => _n( 'about %s second ago', 'about %s seconds ago', $count, 'twitter-widget-pro' ),
 		);
 
 		return sprintf( $messages[$key], $count );
@@ -1240,7 +1234,7 @@ class wpTwitterWidget extends AaronPlugin {
 			'targetBlank'     => 'false',
 			'items'           => 10,
 			'showts'          => 60 * 60 * 24,
-			'dateFormat'      => __( 'h:i:s A F d, Y', $this->_slug ),
+			'dateFormat'      => __( 'h:i:s A F d, Y', 'twitter-widget-pro' ),
 		);
 
 		/**
@@ -1310,7 +1304,7 @@ class wpTwitterWidget extends AaronPlugin {
 			'targetBlank'     => 'false',
 			'items'           => 10,
 			'showts'          => 60 * 60 * 24,
-			'dateFormat'      => __( 'h:i:s A F d, Y', $this->_slug ),
+			'dateFormat'      => __( 'h:i:s A F d, Y', 'twitter-widget-pro' ),
 		);
 
 		return $this->fixAvatar( wp_parse_args( $settings, $defaultArgs ) );

@@ -157,13 +157,12 @@ if (!class_exists('AaronPlugin')) {
 		}
 
 		public function init_locale() {
-			$lang_dir = basename(dirname(__FILE__)) . '/languages';
-			load_plugin_textdomain( $this->_slug, 'wp-content/plugins/' . $lang_dir, $lang_dir);
+			load_plugin_textdomain( 'twitter-widget-pro' );
 		}
 
 		protected function _get_settings() {
 			foreach ( $this->_optionNames as $opt ) {
-				$this->_settings[$opt] = apply_filters($this->_slug.'-opt-'.$opt, get_option($opt));
+				$this->_settings[$opt] = apply_filters( 'twitter-widget-pro-opt-'.$opt, get_option($opt));
 			}
 		}
 
@@ -201,8 +200,7 @@ if (!class_exists('AaronPlugin')) {
 		}
 
 		public function register_options_page() {
-			if ( apply_filters( 'rpf-options_page-'.$this->_slug, true ) && is_callable( array( $this, 'options_page' ) ) )
-				add_options_page( $this->_pageTitle, $this->_menuTitle, $this->_accessLevel, $this->_hook, array( $this, 'options_page' ) );
+			add_options_page( $this->_pageTitle, $this->_menuTitle, $this->_accessLevel, $this->_hook, array( $this, 'options_page' ) );
 		}
 
 		protected function _filter_boxes_main($boxName) {
@@ -222,7 +220,7 @@ if (!class_exists('AaronPlugin')) {
 
 		public function options_page() {
 			global $wp_meta_boxes;
-			$allBoxes = array_keys( $wp_meta_boxes['aaron-'.$this->_slug] );
+			$allBoxes = array_keys( $wp_meta_boxes['aaron-twitter-widget-pro'] );
 			$mainBoxes = array_filter( $allBoxes, array( $this, '_filter_boxes_main' ) );
 			unset($mainBoxes['main']);
 			sort($mainBoxes);
@@ -244,20 +242,16 @@ if (!class_exists('AaronPlugin')) {
 							<form action="<?php esc_attr_e( $this->_optionsPageAction ); ?>" method="post"<?php do_action( 'rpf-options-page-form-tag' ) ?>>
 								<?php
 								settings_fields( $this->_optionGroup );
-								do_meta_boxes( 'aaron-' . $this->_slug, 'main', '' );
-								if ( apply_filters( 'rpf-show-general-settings-submit'.$this->_slug, true ) ) {
+								do_meta_boxes( 'aaron-twitter-widget-pro', 'main', '' );
 								?>
 								<p class="submit">
-									<input type="submit" name="Submit" value="<?php esc_attr_e('Update Options &raquo;', $this->_slug); ?>" />
+									<input type="submit" name="Submit" value="<?php esc_attr_e( 'Update Options &raquo;', 'twitter-widget-pro' ); ?>" />
 								</p>
-								<?php
-								}
-								?>
 							</form>
 						<?php
 							}
 							foreach( $mainBoxes as $context ) {
-								do_meta_boxes( 'aaron-' . $this->_slug, $context, '' );
+								do_meta_boxes( 'aaron-twitter-widget-pro', $context, '' );
 							}
 						?>
 						</div>
@@ -267,7 +261,7 @@ if (!class_exists('AaronPlugin')) {
 						<div class="alignright" style="width:24%;">
 							<?php
 							foreach( $sidebarBoxes as $context ) {
-								do_meta_boxes( 'aaron-' . $this->_slug, $context, '' );
+								do_meta_boxes( 'aaron-twitter-widget-pro', $context, '' );
 							}
 							?>
 						</div>
@@ -300,36 +294,28 @@ if (!class_exists('AaronPlugin')) {
 
 		public function get_support_forum_link( $linkText = '' ) {
 			if ( empty($linkText) ) {
-				$linkText = __( 'Support', $this->_slug );
+				$linkText = __( 'Support', 'twitter-widget-pro' );
 			}
 			return '<a href="' . $this->get_support_forum_url() . '">' . $linkText . '</a>';
 		}
 
-		public function get_donate_link( $linkText = '' ) {
-			$url = 'https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=' . $this->_paypalButtonId;
-			if ( empty($linkText) ) {
-				$linkText = __( 'Donate to show your appreciation.', $this->_slug );
-			}
-			return "<a href='{$url}'>{$linkText}</a>";
-		}
-
 		public function get_support_forum_url() {
-			return 'http://wordpress.org/support/plugin/' . $this->_slug;
+			return 'http://wordpress.org/support/plugin/twitter-widget-pro';
 		}
 
 		public function get_plugin_link( $linkText = '' ) {
 			if ( empty($linkText) )
-				$linkText = __( 'Give it a good rating on WordPress.org.', $this->_slug );
+				$linkText = __( 'Give it a good rating on WordPress.org.', 'twitter-widget-pro' );
 			return "<a href='" . $this->get_plugin_url() . "'>{$linkText}</a>";
 		}
 
 		public function get_plugin_url() {
-			return 'http://wordpress.org/extend/plugins/' . $this->_slug;
+			return 'http://wordpress.org/extend/plugins/twitter-widget-pro';
 		}
 
 		public function get_options_link( $linkText = '' ) {
 			if ( empty($linkText) ) {
-				$linkText = __( 'Settings', $this->_slug );
+				$linkText = __( 'Settings', 'twitter-widget-pro' );
 			}
 			return '<a href="' . $this->get_options_url() . '">' . $linkText . '</a>';
 		}
@@ -346,35 +332,32 @@ if (!class_exists('AaronPlugin')) {
 
 		public function add_default_options_meta_boxes() {
 			if ( apply_filters( 'show-aaron-like-this', true ) )
-				add_meta_box( $this->_slug . '-like-this', __('Like this Plugin?', $this->_slug), array($this, 'like_this_meta_box'), 'aaron-' . $this->_slug, 'sidebar');
+				add_meta_box( 'twitter-widget-pro-like-this', __('Like this Plugin?', 'twitter-widget-pro'), array($this, 'like_this_meta_box'), 'aaron-twitter-widget-pro', 'sidebar');
 
 			if ( apply_filters( 'show-aaron-support', true ) )
-				add_meta_box( $this->_slug . '-support', __('Need Support?', $this->_slug), array($this, 'support_meta_box'), 'aaron-' . $this->_slug, 'sidebar');
+				add_meta_box( 'twitter-widget-pro-support', __('Need Support?', 'twitter-widget-pro'), array($this, 'support_meta_box'), 'aaron-twitter-widget-pro', 'sidebar');
 
 			if ( apply_filters( 'show-aaron-feed', true ) )
-				add_meta_box( $this->_slug . '-aaron-feed', __('Latest news from Aaron', $this->_slug), array($this, 'aaron_feed_meta_box'), 'aaron-' . $this->_slug, 'sidebar');
+				add_meta_box( 'twitter-widget-pro-aaron-feed', __('Latest news from Aaron', 'twitter-widget-pro'), array($this, 'aaron_feed_meta_box'), 'aaron-twitter-widget-pro', 'sidebar');
 		}
 
 		public function like_this_meta_box() {
 			echo '<p>';
-			_e('Then please do any or all of the following:', $this->_slug);
+			_e('Then please do any or all of the following:', 'twitter-widget-pro');
 			echo '</p><ul>';
 
-			$url = apply_filters('aaron-plugin-url-'.$this->_slug, 'https://aarondcampbell.com/wordpress-plugin/'.$this->_slug);
-			echo "<li><a href='{$url}'>";
-			_e('Link to it so others can find out about it.', $this->_slug);
+			echo "<li><a href='https://aarondcampbell.com/wordpress-plugin/twitter-widget-pro'>";
+			_e('Link to it so others can find out about it.', 'twitter-widget-pro');
 			echo "</a></li>";
 
 			echo '<li>' . $this->get_plugin_link() . '</li>';
-
-			echo '<li>' . $this->get_donate_link() . '</li>';
 
 			echo '</ul>';
 		}
 
 		public function support_meta_box() {
 			echo '<p>';
-			echo sprintf(__('If you have any problems with this plugin or ideas for improvements or enhancements, please use the <a href="%s">Support Forums</a>.', $this->_slug), $this->get_support_forum_url() );
+			echo sprintf(__('If you have any problems with this plugin or ideas for improvements or enhancements, please use the <a href="%s">Support Forums</a>.', 'twitter-widget-pro'), $this->get_support_forum_url() );
 			echo '</p>';
 		}
 
