@@ -30,7 +30,6 @@
 
 require_once( 'tlc-transients.php' );
 require_once( 'class.wp_widget_twitter_pro.php' );
-define( 'TWP_VERSION', '2.7.0' );
 
 /**
  * wpTwitterWidget is the class that handles everything outside the widget. This
@@ -135,10 +134,6 @@ class wpTwitterWidget {
 		add_filter( 'twitter-widget-pro-opt-twp', array( $this, 'filterSettings' ) );
 		add_filter( 'twitter-widget-pro-opt-twp-authed-users', array( $this, 'authed_users_option' ) );
 		add_shortcode( 'twitter-widget', array( $this, 'handleShortcodes' ) );
-
-		$twp_version = get_option( 'twp_version' );
-		if ( TWP_VERSION != $twp_version )
-			update_option( 'twp_version', TWP_VERSION );
 
 		$this->_get_settings();
 		if ( is_callable( array($this, '_post_settings_init') ) )
