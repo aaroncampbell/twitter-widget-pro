@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: twitter, widget, feed
 Requires at least: 3.0
 Tested up to: 4.3
-Stable tag: 2.7.0
+Stable tag: 2.8.0
 
 A widget that properly handles twitter feeds, including parsing @username, #hashtags, and URLs into links.
 
@@ -130,6 +130,9 @@ Apparently the database queries required to display the friends feed was causing
 
 == Upgrade Notice ==
 
+= 2.8.0 =
+Updates to make the plugin translatable with the new translate.wordpress.org
+
 = 2.7.0 =
 Updates to avoid notices in WordPress 4.3 and PHP 7
 
@@ -152,6 +155,11 @@ Fix potential conflict with other oAuth plugins
 Upgrade to the new Twitter API and add support for lists
 
 == Changelog ==
+
+= 2.8.0 =
+* Move to a static text domain
+* Move away from my plugin framework
+* Fix a leftover Range link
 
 = 2.7.0 =
 * Use __contrsuct instead of WP_Widget->WP_Widget

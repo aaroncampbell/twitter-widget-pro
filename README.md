@@ -119,6 +119,11 @@ Apparently the database queries required to display the friends feed was causing
 
 ## Changelog
 
+### 2.8.0
+* Move to a static text domain
+* Move away from my plugin framework
+* Fix a leftover Range link
+
 ### 2.7.0
 * Use __contrsuct instead of WP_Widget->WP_Widget
 * Move away from Range
