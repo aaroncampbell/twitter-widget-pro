@@ -115,7 +115,7 @@ There are plenty of CSS classes throughout the HTML that is generated, and you c
 
 **Why can't I display a friends feed anymore?**
 
-Aparently the database queries required to display the friends feed was causing twitter to crash, so they removed it.  Unfortunately, this is outside my control.
+Apparently the database queries required to display the friends feed was causing twitter to crash, so they removed it.  Unfortunately, this is outside my control.
 
 ## Changelog
 
