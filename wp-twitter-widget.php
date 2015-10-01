@@ -29,7 +29,6 @@
 */
 
 require_once( 'tlc-transients.php' );
-require_once( 'aaron-plugin-framework.php' );
 require_once( 'class.wp_widget_twitter_pro.php' );
 define( 'TWP_VERSION', '2.7.0' );
 
@@ -38,7 +37,7 @@ define( 'TWP_VERSION', '2.7.0' );
  * includes filters that modify tweet content for things like linked usernames.
  * It also helps us avoid name collisions.
  */
-class wpTwitterWidget extends AaronPlugin {
+class wpTwitterWidget {
 	/**
 	 * @var wpTwitter
 	 */
@@ -49,18 +48,78 @@ class wpTwitterWidget extends AaronPlugin {
 	 */
 	static $instance = false;
 
-	protected function _init() {
+	/**
+	 * @var array Plugin settings
+	 */
+	protected $_settings;
+
+	/**
+	 * @var string - The options page name used in the URL
+	 */
+	protected $_hook = 'twitterWidgetPro';
+
+	/**
+	 * @var string - The filename for the main plugin file
+	 */
+	protected $_file = '';
+
+	/**
+	 * @var string - The options page title
+	 */
+	protected $_pageTitle = '';
+
+	/**
+	 * @var string - The options page menu title
+	 */
+	protected $_menuTitle = '';
+
+	/**
+	 * @var string - The access level required to see the options page
+	 */
+	protected $_accessLevel = 'manage_options';
+
+	/**
+	 * @var string - The option group to register
+	 */
+	protected $_optionGroup = 'twp-options';
+
+	/**
+	 * @var array - An array of options to register to the option group
+	 */
+	protected $_optionNames = array( 'twp' );
+
+	/**
+	 * @var array - An associated array of callbacks for the options, option name should be index, callback should be value
+	 */
+	protected $_optionCallbacks = array();
+
+	/**
+	 * @var string - The plugin slug used on WordPress.org
+	 */
+	protected $_slug = '';
+
+	/**
+	 * @var string - The feed URL for AaronDCampbell.com
+	 */
+	protected $_feed_url = 'http://aarondcampbell.com/feed/';
+
+	/**
+	 * @var string - The button ID for the PayPal button, override this generic one with a plugin-specific one
+	 */
+	protected $_paypalButtonId = '9993090';
+
+	protected $_optionsPageAction = 'options.php';
+
+	/**
+	 * This is our constructor, which is private to force the use of getInstance()
+	 * @return void
+	 */
+	protected function __construct() {
 		require_once( 'lib/wp-twitter.php' );
 
-		$this->_hook = 'twitterWidgetPro';
 		$this->_file = plugin_basename( __FILE__ );
 		$this->_pageTitle = __( 'Twitter Widget Pro', 'twitter-widget-pro' );
 		$this->_menuTitle = __( 'Twitter Widget', 'twitter-widget-pro' );
-		$this->_accessLevel = 'manage_options';
-		$this->_optionGroup = 'twp-options';
-		$this->_optionNames = array( 'twp' );
-		$this->_optionCallbacks = array();
-		$this->_paypalButtonId = '9993090';
 
 		/**
 		 * Add filters and actions
@@ -80,6 +139,24 @@ class wpTwitterWidget extends AaronPlugin {
 		$twp_version = get_option( 'twp_version' );
 		if ( TWP_VERSION != $twp_version )
 			update_option( 'twp_version', TWP_VERSION );
+
+		$this->_get_settings();
+		if ( is_callable( array($this, '_post_settings_init') ) )
+			$this->_post_settings_init();
+
+		add_filter( 'init', array( $this, 'init_locale' ) );
+		add_action( 'admin_init', array( $this, 'register_options' ) );
+		add_filter( 'plugin_action_links', array( $this, 'add_plugin_page_links' ), 10, 2 );
+		add_filter( 'plugin_row_meta', array( $this, 'add_plugin_meta_links' ), 10, 2 );
+		add_action( 'admin_menu', array( $this, 'register_options_page' ) );
+		if ( is_callable(array( $this, 'add_options_meta_boxes' )) )
+			add_action( 'admin_init', array( $this, 'add_options_meta_boxes' ) );
+
+		add_action( 'admin_init', array( $this, 'add_default_options_meta_boxes' ) );
+		add_action( 'admin_print_scripts', array( $this,'admin_print_scripts' ) );
+		add_action( 'admin_enqueue_scripts', array( $this,'admin_enqueue_scripts' ) );
+
+		add_action ( 'in_plugin_update_message-'.$this->_file , array ( $this , 'changelog' ), null, 2 );
 	}
 
 	protected function _post_settings_init() {
@@ -1169,6 +1246,241 @@ class wpTwitterWidget extends AaronPlugin {
 	public function init() {
 		if ( isset( $_GET['twp-test-local-request'] ) && ! empty( $_POST['_twp-test-local-request'] ) && 'test' === $_POST['_twp-test-local-request'] ) {
 			die( 'success' );
+		}
+	}
+
+	public function init_locale() {
+		load_plugin_textdomain( 'twitter-widget-pro' );
+	}
+
+	protected function _get_settings() {
+		foreach ( $this->_optionNames as $opt ) {
+			$this->_settings[$opt] = apply_filters( 'twitter-widget-pro-opt-'.$opt, get_option($opt));
+		}
+	}
+
+	public function register_options() {
+		foreach ( $this->_optionNames as $opt ) {
+			if ( !empty($this->_optionCallbacks[$opt]) && is_callable( $this->_optionCallbacks[$opt] ) ) {
+				$callback = $this->_optionCallbacks[$opt];
+			} else {
+				$callback = '';
+			}
+			register_setting( $this->_optionGroup, $opt, $callback );
+		}
+	}
+
+	public function changelog ($pluginData, $newPluginData) {
+		require_once( ABSPATH . 'wp-admin/includes/plugin-install.php' );
+
+		$plugin = plugins_api( 'plugin_information', array( 'slug' => $newPluginData->slug ) );
+
+		if ( !$plugin || is_wp_error( $plugin ) || empty( $plugin->sections['changelog'] ) ) {
+			return;
+		}
+
+		$changes = $plugin->sections['changelog'];
+		$pos = strpos( $changes, '<h4>' . preg_replace('/[^\d\.]/', '', $pluginData['Version'] ) );
+		if ( $pos !== false ) {
+			$changes = trim( substr( $changes, 0, $pos ) );
+		}
+
+		$replace = array(
+			'<ul>'	=> '<ul style="list-style: disc inside; padding-left: 15px; font-weight: normal;">',
+			'<h4>'	=> '<h4 style="margin-bottom:0;">',
+		);
+		echo str_replace( array_keys($replace), $replace, $changes );
+	}
+
+	public function register_options_page() {
+		add_options_page( $this->_pageTitle, $this->_menuTitle, $this->_accessLevel, $this->_hook, array( $this, 'options_page' ) );
+	}
+
+	protected function _filter_boxes_main($boxName) {
+		if ( 'main' == strtolower($boxName) )
+			return false;
+
+		return $this->_filter_boxes_helper($boxName, 'main');
+	}
+
+	protected function _filter_boxes_sidebar($boxName) {
+		return $this->_filter_boxes_helper($boxName, 'sidebar');
+	}
+
+	protected function _filter_boxes_helper($boxName, $test) {
+		return ( strpos( strtolower($boxName), strtolower($test) ) !== false );
+	}
+
+	public function options_page() {
+		global $wp_meta_boxes;
+		$allBoxes = array_keys( $wp_meta_boxes['aaron-twitter-widget-pro'] );
+		$mainBoxes = array_filter( $allBoxes, array( $this, '_filter_boxes_main' ) );
+		unset($mainBoxes['main']);
+		sort($mainBoxes);
+		$sidebarBoxes = array_filter( $allBoxes, array( $this, '_filter_boxes_sidebar' ) );
+		unset($sidebarBoxes['sidebar']);
+		sort($sidebarBoxes);
+
+		$main_width = empty( $sidebarBoxes )? '100%' : '75%';
+		?>
+			<div class="wrap">
+				<?php $this->screen_icon_link(); ?>
+				<h2><?php echo esc_html($this->_pageTitle); ?></h2>
+				<div class="metabox-holder">
+					<div class="postbox-container" style="width:<?php echo $main_width; ?>;">
+					<?php
+						do_action( 'rpf-pre-main-metabox', $main_width );
+						if ( in_array( 'main', $allBoxes ) ) {
+					?>
+						<form action="<?php esc_attr_e( $this->_optionsPageAction ); ?>" method="post"<?php do_action( 'rpf-options-page-form-tag' ) ?>>
+							<?php
+							settings_fields( $this->_optionGroup );
+							do_meta_boxes( 'aaron-twitter-widget-pro', 'main', '' );
+							?>
+							<p class="submit">
+								<input type="submit" name="Submit" value="<?php esc_attr_e( 'Update Options &raquo;', 'twitter-widget-pro' ); ?>" />
+							</p>
+						</form>
+					<?php
+						}
+						foreach( $mainBoxes as $context ) {
+							do_meta_boxes( 'aaron-twitter-widget-pro', $context, '' );
+						}
+					?>
+					</div>
+					<?php
+					if ( !empty( $sidebarBoxes ) ) {
+					?>
+					<div class="alignright" style="width:24%;">
+						<?php
+						foreach( $sidebarBoxes as $context ) {
+							do_meta_boxes( 'aaron-twitter-widget-pro', $context, '' );
+						}
+						?>
+					</div>
+					<?php
+					}
+					?>
+				</div>
+			</div>
+			<?php
+	}
+
+	public function add_plugin_page_links( $links, $file ){
+		if ( $file == $this->_file ) {
+			// Add Widget Page link to our plugin
+			$link = $this->get_options_link();
+			array_unshift( $links, $link );
+
+			// Add Support Forum link to our plugin
+			$link = $this->get_support_forum_link();
+			array_unshift( $links, $link );
+		}
+		return $links;
+	}
+
+	public function add_plugin_meta_links( $meta, $file ){
+		if ( $file == $this->_file )
+			$meta[] = $this->get_plugin_link(__('Rate Plugin'));
+		return $meta;
+	}
+
+	public function get_support_forum_link( $linkText = '' ) {
+		if ( empty($linkText) ) {
+			$linkText = __( 'Support', 'twitter-widget-pro' );
+		}
+		return '<a href="' . $this->get_support_forum_url() . '">' . $linkText . '</a>';
+	}
+
+	public function get_support_forum_url() {
+		return 'http://wordpress.org/support/plugin/twitter-widget-pro';
+	}
+
+	public function get_plugin_link( $linkText = '' ) {
+		if ( empty($linkText) )
+			$linkText = __( 'Give it a good rating on WordPress.org.', 'twitter-widget-pro' );
+		return "<a href='" . $this->get_plugin_url() . "'>{$linkText}</a>";
+	}
+
+	public function get_plugin_url() {
+		return 'http://wordpress.org/extend/plugins/twitter-widget-pro';
+	}
+
+	public function get_options_link( $linkText = '' ) {
+		if ( empty($linkText) ) {
+			$linkText = __( 'Settings', 'twitter-widget-pro' );
+		}
+		return '<a href="' . $this->get_options_url() . '">' . $linkText . '</a>';
+	}
+
+	public function get_options_url() {
+		return admin_url( 'options-general.php?page=' . $this->_hook );
+	}
+
+	public function admin_enqueue_scripts() {
+		if (isset($_GET['page']) && $_GET['page'] == $this->_hook) {
+			wp_enqueue_style('dashboard');
+		}
+	}
+
+	public function add_default_options_meta_boxes() {
+		if ( apply_filters( 'show-aaron-like-this', true ) )
+			add_meta_box( 'twitter-widget-pro-like-this', __('Like this Plugin?', 'twitter-widget-pro'), array($this, 'like_this_meta_box'), 'aaron-twitter-widget-pro', 'sidebar');
+
+		if ( apply_filters( 'show-aaron-support', true ) )
+			add_meta_box( 'twitter-widget-pro-support', __('Need Support?', 'twitter-widget-pro'), array($this, 'support_meta_box'), 'aaron-twitter-widget-pro', 'sidebar');
+
+		if ( apply_filters( 'show-aaron-feed', true ) )
+			add_meta_box( 'twitter-widget-pro-aaron-feed', __('Latest news from Aaron', 'twitter-widget-pro'), array($this, 'aaron_feed_meta_box'), 'aaron-twitter-widget-pro', 'sidebar');
+	}
+
+	public function like_this_meta_box() {
+		echo '<p>';
+		_e('Then please do any or all of the following:', 'twitter-widget-pro');
+		echo '</p><ul>';
+
+		echo "<li><a href='https://aarondcampbell.com/wordpress-plugin/twitter-widget-pro'>";
+		_e('Link to it so others can find out about it.', 'twitter-widget-pro');
+		echo "</a></li>";
+
+		echo '<li>' . $this->get_plugin_link() . '</li>';
+
+		echo '</ul>';
+	}
+
+	public function support_meta_box() {
+		echo '<p>';
+		echo sprintf(__('If you have any problems with this plugin or ideas for improvements or enhancements, please use the <a href="%s">Support Forums</a>.', 'twitter-widget-pro'), $this->get_support_forum_url() );
+		echo '</p>';
+	}
+
+	public function aaron_feed_meta_box() {
+		$args = array(
+			'url'			=> $this->_feed_url,
+			'items'			=> '5',
+		);
+		echo '<div class="rss-widget">';
+		wp_widget_rss_output( $args );
+		echo "</div>";
+	}
+
+	public function screen_icon_link($name = 'aaron') {
+		$link = '<a href="http://aarondcampbell.com">';
+		if ( function_exists( 'get_screen_icon' ) ) {
+			$link .= get_screen_icon( $name );
+		} else {
+			ob_start();
+			screen_icon($name);
+			$link .= ob_get_clean();
+		}
+		$link .= '</a>';
+		echo apply_filters('rpf-screen_icon_link', $link, $name );
+	}
+
+	public function admin_print_scripts() {
+		if (isset($_GET['page']) && $_GET['page'] == $this->_hook) {
+			wp_enqueue_script('postbox');
+			wp_enqueue_script('dashboard');
 		}
 	}
 
