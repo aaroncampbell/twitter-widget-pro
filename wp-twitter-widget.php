@@ -813,7 +813,13 @@ class wpTwitterWidget {
 			foreach ( $tweets as $tweet ) {
 				// Set our "ago" string which converts the date to "# ___(s) ago"
 				$tweet->ago = $this->_timeSince( strtotime( $tweet->created_at ), $args['showts'], $args['dateFormat'] );
-				$entryContent = apply_filters( 'widget_twitter_content', $tweet->text, $tweet );
+				// Use full text of retweets
+				if ( isset($tweet->retweeted_status) ) {
+					$tweet_text = "RT @".$tweet->retweeted_status->user->screen_name.":".$tweet->retweeted_status->text;
+				} else {
+					$tweet_text = $tweet->text;
+				}
+				$entryContent = apply_filters( 'widget_twitter_content', $tweet_text, $tweet );
 				$widgetContent .= '<li>';
 				$widgetContent .= "<span class='entry-content'>{$entryContent}</span>";
 				$widgetContent .= " <span class='entry-meta'>";
