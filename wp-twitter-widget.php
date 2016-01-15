@@ -823,7 +823,7 @@ class wpTwitterWidget {
 				$widgetContent .= '<li>';
 				$widgetContent .= "<span class='entry-content'>{$entryContent}</span>";
 				$widgetContent .= " <span class='entry-meta'>";
-				$widgetContent .= "<span class='time-meta'>";
+				$widgetContent .= "<br><span class='time-meta'>";
 				$linkAttrs = array(
 					'href'	=> "http://twitter.com/{$tweet->user->screen_name}/statuses/{$tweet->id_str}"
 				);
@@ -847,7 +847,7 @@ class wpTwitterWidget {
  				$widgetContent .= '</span>';
 
 				if ( 'true' == $args['showintents'] ) {
-					$widgetContent .= ' <span class="intent-meta">';
+					$widgetContent .= '<br><span class="intent-meta">';
 					$lang = $this->_getTwitterLang();
 					if ( !empty( $lang ) )
 						$linkAttrs['data-lang'] = $lang;
@@ -857,12 +857,14 @@ class wpTwitterWidget {
 					$linkAttrs['class'] = 'in-reply-to';
 					$linkAttrs['title'] = $linkText;
 					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
+					$widgetContent .= '&nbsp;|&nbsp;';
 
 					$linkText = __( 'Retweet', 'twitter-widget-pro' );
 					$linkAttrs['href'] = "http://twitter.com/intent/retweet?tweet_id={$tweet->id_str}";
 					$linkAttrs['class'] = 'retweet';
 					$linkAttrs['title'] = $linkText;
 					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
+					$widgetContent .= '&nbsp;|&nbsp;';
 
 					$linkText = __( 'Favorite', 'twitter-widget-pro' );
 					$linkAttrs['href'] = "http://twitter.com/intent/favorite?tweet_id={$tweet->id_str}";
