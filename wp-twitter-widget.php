@@ -781,10 +781,9 @@ class wpTwitterWidget {
 		if ( 'true' == $args['targetBlank'] )
 			add_filter( 'widget_twitter_link_attributes', array( $this, 'targetBlank' ) );
 
-		// Validate our options
-		$args['items'] = (int) $args['items'];
-		if ( $args['items'] < 1 || 20 < $args['items'] )
-			$args['items'] = 10;
+		$number_to_display = (int) $args['items'];
+		// Number requested includes retweets and replies, whether widget is configured to display them or not
+		$args['items'] = 20;
 
 		if ( !isset( $args['showts'] ) )
 			$args['showts'] = 86400;
@@ -868,7 +867,7 @@ class wpTwitterWidget {
 				}
 				$widgetContent .= '</li>';
 
-				if ( ++$count >= $args['items'] )
+				if ( ++$count >= $number_to_display )
 					break;
 			}
 		}
