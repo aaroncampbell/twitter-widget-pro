@@ -1,5 +1,4 @@
 <?php
-require_once( 'oauth-util.php' );
 class wpTwitter {
 	/**
 	 * @var string Twitter App Consumer Key
@@ -12,13 +11,17 @@ class wpTwitter {
 	private $_consumer_secret;
 
 	/**
-	 * @var string Twitter Request or Access Token
+	 * @var array Twitter Request or Access Token
 	 */
 	private $_token;
 
 	private static $_api_url;
 
 	public function __construct( $args ) {
+		if ( ! class_exists( 'wpOAuthUtil' ) ) {
+			require_once( 'oauth-util.php' );
+		}
+
 		$defaults = array(
 			'api-url' => 'https://api.twitter.com/',
 		);
@@ -43,9 +46,11 @@ class wpTwitter {
 	/**
 	 * Get a request_token from Twitter
 	 *
-	 * @returns a key/value array containing oauth_token and oauth_token_secret
+	 * @param string Oauth Callback
+	 *
+	 * @returns array key/value array containing oauth_token and oauth_token_secret
 	 */
-	public function getRequestToken( $oauth_callback = null ) {
+	public function get_request_token( $oauth_callback = null ) {
 		$parameters = array(
 			'oauth_nonce' => md5( microtime() . mt_rand() ),
 		);
@@ -62,16 +67,8 @@ class wpTwitter {
 	private function _get_request_defaults() {
 		$params = array(
 			'sslverify' => apply_filters( 'twp_sslverify', false ),
-			'body'      => array(
-				'oauth_version'      => '1.0',
-				'oauth_nonce'        => md5( microtime() . mt_rand() ),
-				'oauth_timestamp'    => time(),
-				'oauth_consumer_key' => $this->_consumer_key,
-			),
+			'body'      => array(),
 		);
-
-		if ( ! empty( $this->_token['oauth_token'] ) )
-			$params['body']['oauth_token'] = $this->_token['oauth_token'];
 
 		return $params;
 	}
@@ -79,7 +76,9 @@ class wpTwitter {
 	/**
 	 * Get the authorize URL
 	 *
-	 * @returns a string
+	 * @param string $screen_name Twitter user name
+	 *
+	 * @returns bool|string false on failure or URL as string
 	 */
 	public function get_authorize_url( $screen_name = '' ) {
 		if ( empty( $this->_token['oauth_token'] ) )
@@ -97,16 +96,24 @@ class wpTwitter {
 
 	/**
 	 * Format and sign an OAuth / API request
+	 *
+	 * @param string $request_url Twitter URL to request
+	 * @param string $method Usually GET or POST
+	 * @param array $body_parameters Data to send with request
+	 *
+	 * @return object Twitter response or WP_Error
 	 */
 	public function send_authed_request( $request_url, $method, $body_parameters = array() ) {
 		$parameters = $this->_get_request_defaults();
 		$parameters['body'] = wp_parse_args( $body_parameters, $parameters['body'] );
-		if ( ! filter_var( $request_url , FILTER_VALIDATE_URL ) )
+		if ( ! filter_var( $request_url , FILTER_VALIDATE_URL ) ) {
 			$request_url = self::get_api_endpoint( $request_url );
-		$this->sign_request( $parameters, $request_url );
+		}
+
+		$this->sign_request( $parameters, $request_url, $method );
 		switch ($method) {
 			case 'GET':
-				$request_url = $this->get_normalized_http_url( $request_url ) . '?' . twpOAuthUtil::build_http_query( $parameters['body'] );
+				$request_url = $this->get_normalized_http_url( $request_url ) . '?' . wpOAuthUtil::build_http_query( $parameters['body'] );
 				unset( $parameters['body'] );
 				$resp = wp_remote_get( $request_url, $parameters );
 				break;
@@ -142,6 +149,10 @@ class wpTwitter {
 	/**
 	 * parses the url and rebuilds it to be
 	 * scheme://host/path
+	 *
+	 * @param string $url
+	 *
+	 * @return string
 	 */
 	public function get_normalized_http_url( $url ) {
 		$parts = parse_url( $url );
@@ -158,21 +169,45 @@ class wpTwitter {
 	}
 
 	public function sign_request( &$parameters, $request_url, $method = 'GET' ) {
-		$parameters['body']['oauth_signature_method'] = 'HMAC-SHA1';
-		$parameters['body']['oauth_signature'] = $this->build_signature( $parameters['body'], $request_url, $method );
+		$auth_params = array(
+			'oauth_version'          => '1.0',
+			'oauth_nonce'            => md5( microtime() . mt_rand() ),
+			'oauth_timestamp'        => time(),
+			'oauth_consumer_key'     => $this->_consumer_key,
+			'oauth_signature_method' => 'HMAC-SHA1',
+		);
+		if ( ! empty( $this->_token['oauth_token'] ) ) {
+			$auth_params['oauth_token'] = $this->_token['oauth_token'];
+		}
+
+		// For GET requests, oauth parameters are sent in the URL
+		if ( 'GET' === $method ) {
+			$parameters['body'] = array_merge( $parameters['body'], $auth_params );
+			$parameters['body']['oauth_signature'] = $this->build_signature( $parameters['body'], $request_url, $method );
+		} else {
+			// for non-GET requests oauth parameters are sent via headers
+			$auth_params['oauth_signature'] = $this->build_signature( array_merge( $parameters['body'], $auth_params ), $request_url, $method );
+			foreach ( $auth_params as $key => $value ) {
+				$auth_params[$key] = $key . '="' . rawurlencode( $value ) . '"';
+			}
+			$parameters['headers']['Authorization'] = 'OAuth ' . implode( ", ", $auth_params );
+		}
 	}
 
 	/**
-	* The request parameters, sorted and concatenated into a normalized string.
-	* @return string
-	*/
+	 * The request parameters, sorted and concatenated into a normalized string.
+	 *
+	 * @param array $parameters
+	 *
+	 * @return string
+	 */
 	public function get_signable_parameters( $parameters ) {
 		// Remove oauth_signature if present
 		// Ref: Spec: 9.1.1 ("The oauth_signature parameter MUST be excluded.")
 		if ( isset( $parameters['oauth_signature'] ) )
 			unset( $parameters['oauth_signature'] );
 
-		return twpOAuthUtil::build_http_query( $parameters );
+		return wpOAuthUtil::build_http_query( $parameters );
 	}
 
 	public function build_signature( $parameters, $request_url, $method = 'GET' ) {
@@ -182,7 +217,7 @@ class wpTwitter {
 			$this->get_signable_parameters( $parameters )
 		);
 
-		$parts = twpOAuthUtil::urlencode_rfc3986($parts);
+		$parts = wpOAuthUtil::urlencode_rfc3986($parts);
 
 		$base_string = implode('&', $parts);
 		$token_secret = '';
@@ -195,7 +230,7 @@ class wpTwitter {
 			$token_secret,
 		);
 
-		$key_parts = twpOAuthUtil::urlencode_rfc3986( $key_parts );
+		$key_parts = wpOAuthUtil::urlencode_rfc3986( $key_parts );
 		$key = implode( '&', $key_parts );
 
 		return base64_encode( hash_hmac( 'sha1', $base_string, $key, true ) );
@@ -204,6 +239,8 @@ class wpTwitter {
 	/**
 	 * Exchange request token and secret for an access token and
 	 * secret, to sign API calls.
+	 *
+	 * @param bool|string $oauth_verifier
 	 *
 	 * @returns array containing oauth_token,
 	 *                           oauth_token_secret,

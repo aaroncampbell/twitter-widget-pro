@@ -114,8 +114,6 @@ class wpTwitterWidget {
 	 * @return void
 	 */
 	protected function __construct() {
-		require_once( 'lib/wp-twitter.php' );
-
 		$this->_file = plugin_basename( __FILE__ );
 		$this->_pageTitle = __( 'Twitter Widget Pro', 'twitter-widget-pro' );
 		$this->_menuTitle = __( 'Twitter Widget', 'twitter-widget-pro' );
@@ -159,6 +157,9 @@ class wpTwitterWidget {
 			'consumer-key'    => $this->_settings['twp']['consumer-key'],
 			'consumer-secret' => $this->_settings['twp']['consumer-secret'],
 		);
+		if ( ! class_exists( 'wpTwitter' ) ) {
+			require_once( 'lib/wp-twitter.php' );
+		}
 		$this->_wp_twitter_oauth = new wpTwitter( $oauth_settings );
 
 		// We want to fill 'twp-authed-users' but not overwrite them when saving
@@ -206,7 +207,7 @@ class wpTwitterWidget {
 		if ( 'authorize' == $_GET['action'] ) {
 			check_admin_referer( 'authorize' );
 			$auth_redirect = add_query_arg( array( 'action' => 'authorized' ), $this->get_options_url() );
-			$token = $this->_wp_twitter_oauth->getRequestToken( $auth_redirect );
+			$token = $this->_wp_twitter_oauth->get_request_token( $auth_redirect );
 			if ( is_wp_error( $token ) ) {
 				$this->_error = $token;
 				return;
