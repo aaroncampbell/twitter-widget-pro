@@ -1320,7 +1320,6 @@ class wpTwitterWidget {
 		$main_width = empty( $sidebarBoxes )? '100%' : '75%';
 		?>
 			<div class="wrap">
-				<?php $this->screen_icon_link(); ?>
 				<h2><?php echo esc_html($this->_pageTitle); ?></h2>
 				<div class="metabox-holder">
 					<div class="postbox-container" style="width:<?php echo $main_width; ?>;">
@@ -1458,19 +1457,6 @@ class wpTwitterWidget {
 		echo '<div class="rss-widget">';
 		wp_widget_rss_output( $args );
 		echo "</div>";
-	}
-
-	public function screen_icon_link($name = 'aaron') {
-		$link = '<a href="http://aarondcampbell.com">';
-		if ( function_exists( 'get_screen_icon' ) ) {
-			$link .= get_screen_icon( $name );
-		} else {
-			ob_start();
-			screen_icon($name);
-			$link .= ob_get_clean();
-		}
-		$link .= '</a>';
-		echo apply_filters('rpf-screen_icon_link', $link, $name );
 	}
 
 	public function admin_print_scripts() {
