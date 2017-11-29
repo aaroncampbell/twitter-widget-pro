@@ -3,7 +3,7 @@
  * Plugin Name: Twitter Widget Pro
  * Plugin URI: https://aarondcampbell.com/wordpress-plugin/twitter-widget-pro/
  * Description: A widget that properly handles twitter feeds, including @username, #hashtag, and link parsing.  It can even display profile images for the users.  Requires PHP5.
- * Version: 2.9.0-alpha
+ * Version: 2.9.0
  * Author: Aaron D. Campbell
  * Author URI: https://aarondcampbell.com/
  * License: GPLv2 or later

@@ -119,6 +119,12 @@ Apparently the database queries required to display the friends feed was causing
 
 ## Changelog
 
+### 2.9.0
+* Remove screen icon code
+* Update WordPress Twitter helper class
+* Update Twitter oAuth class
+* Load class files conditionally
+
 ### 2.8.0
 * Move to a static text domain
 * Move away from my plugin framework
