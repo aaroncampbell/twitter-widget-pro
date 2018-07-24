@@ -3,7 +3,7 @@
  * Plugin Name: Twitter Widget Pro - DSS Fork
  * Plugin URI: http://bluedogwebservices.com/wordpress-plugin/twitter-widget-pro/
  * Description: A widget that properly handles twitter feeds, including @username, #hashtag, and link parsing.  It can even display profile images for the users.  Requires PHP5.
- * Version: 2.6.1
+ * Version: 2.6.2
  * Author: Aaron D. Campbell
  * Author URI: http://ran.ge/
  * License: GPLv2 or later
@@ -30,41 +30,44 @@
 
 require_once( 'tlc-transients.php' );
 require_once( 'range-plugin-framework.php' );
-define( 'TWP_VERSION', '2.6.1' );
+define( 'TWP_VERSION', '2.6.2' );
 
 /**
  * WP_Widget_Twitter_Pro is the class that handles the main widget.
  */
 class WP_Widget_Twitter_Pro extends WP_Widget {
-	public function WP_Widget_Twitter_Pro () {
-		$this->_slug = 'twitter-widget-pro';
+
+
+	// public function WP_Widget_Twitter_Pro () {
+	public function __construct() {
+		$this->_slug     = 'twitter-widget-pro';
 		$wpTwitterWidget = wpTwitterWidget::getInstance();
-		$widget_ops = array(
-			'classname' => 'widget_twitter',
-			'description' => __( 'Follow a Twitter Feed', $wpTwitterWidget->get_slug() )
+		$widget_ops      = array(
+			'classname'   => 'widget_twitter',
+			'description' => __( 'Follow a Twitter Feed', $wpTwitterWidget->get_slug() ),
 		);
-		$control_ops = array(
-			'width' => 400,
-			'height' => 350,
-			'id_base' => 'twitter'
+		$control_ops     = array(
+			'width'   => 400,
+			'height'  => 350,
+			'id_base' => 'twitter',
 		);
-		$name = __( 'Twitter Widget Pro', $wpTwitterWidget->get_slug() );
+		$name            = __( 'Twitter Widget Pro', $wpTwitterWidget->get_slug() );
 
 		$this->WP_Widget( 'twitter', $name, $widget_ops, $control_ops );
 	}
 
-	private function _getInstanceSettings ( $instance ) {
+	private function _getInstanceSettings( $instance ) {
 		$wpTwitterWidget = wpTwitterWidget::getInstance();
 		return $wpTwitterWidget->getSettings( $instance );
 	}
 
 	public function form( $instance ) {
-		$instance = $this->_getInstanceSettings( $instance );
+		$instance        = $this->_getInstanceSettings( $instance );
 		$wpTwitterWidget = wpTwitterWidget::getInstance();
-		$users = $wpTwitterWidget->get_users_list( true );
-		$lists = $wpTwitterWidget->get_lists();
+		$users           = $wpTwitterWidget->get_users_list( true );
+		$lists           = $wpTwitterWidget->get_lists();
 
-?>
+		?>
 			<p>
 				<label for="<?php echo $this->get_field_id( 'username' ); ?>"><?php _e( 'Twitter username:', $this->_slug ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'username' ); ?>" name="<?php echo $this->get_field_name( 'username' ); ?>">
@@ -73,10 +76,11 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 					$selected = false;
 					foreach ( $users as $u ) {
 						?>
-						<option value="<?php echo esc_attr( strtolower( $u['screen_name'] ) ); ?>"<?php $s = selected( strtolower( $u['screen_name'] ), strtolower( $instance['username'] ) ) ?>><?php echo esc_html( $u['screen_name'] ); ?></option>
+						<option value="<?php echo esc_attr( strtolower( $u['screen_name'] ) ); ?>"<?php $s = selected( strtolower( $u['screen_name'] ), strtolower( $instance['username'] ) ); ?>><?php echo esc_html( $u['screen_name'] ); ?></option>
 						<?php
-						if ( ! empty( $s ) )
+						if ( ! empty( $s ) ) {
 							$selected = true;
+						}
 					}
 					?>
 				</select>
@@ -90,7 +94,7 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 						echo '<optgroup label="' . esc_attr( $user ) . '">';
 						foreach ( $user_lists as $list_id => $list_name ) {
 							?>
-							<option value="<?php echo esc_attr( $user . '::' . $list_id ); ?>"<?php $s = selected( $user . '::' . $list_id, strtolower( $instance['list'] ) ) ?>><?php echo esc_html( $list_name ); ?></option>
+							<option value="<?php echo esc_attr( $user . '::' . $list_id ); ?>"<?php $s = selected( $user . '::' . $list_id, strtolower( $instance['list'] ) ); ?>><?php echo esc_html( $list_name ); ?></option>
 							<?php
 						}
 						echo '</optgroup>';
@@ -100,8 +104,8 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 			</p>
 			<?php
 			if ( ! $selected && ! empty( $instance['username'] ) ) {
-				$query_args = array(
-					'action' => 'authorize',
+				$query_args         = array(
+					'action'      => 'authorize',
 					'screen_name' => $instance['username'],
 				);
 				$authorize_user_url = wp_nonce_url( add_query_arg( $query_args, $wpTwitterWidget->get_options_url() ), 'authorize' );
@@ -122,20 +126,20 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 				<label for="<?php echo $this->get_field_id( 'items' ); ?>"><?php _e( 'How many items would you like to display?', $this->_slug ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'items' ); ?>" name="<?php echo $this->get_field_name( 'items' ); ?>">
 					<?php
-						for ( $i = 1; $i <= 20; ++$i ) {
-							echo "<option value='$i' ". selected( $instance['items'], $i, false ). ">$i</option>";
-						}
+					for ( $i = 1; $i <= 20; ++$i ) {
+						echo "<option value='$i' " . selected( $instance['items'], $i, false ) . ">$i</option>";
+					}
 					?>
 				</select>
 			</p>
 			<p>
 				<label for="<?php echo $this->get_field_id( 'avatar' ); ?>"><?php _e( 'Display profile image?', $this->_slug ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'avatar' ); ?>" name="<?php echo $this->get_field_name( 'avatar' ); ?>">
-					<option value=""<?php selected( $instance['avatar'], '' ) ?>><?php _e( 'Do not show', $this->_slug ); ?></option>
-					<option value="mini"<?php selected( $instance['avatar'], 'mini' ) ?>><?php _e( 'Mini - 24px by 24px', $this->_slug ); ?></option>
-					<option value="normal"<?php selected( $instance['avatar'], 'normal' ) ?>><?php _e( 'Normal - 48px by 48px', $this->_slug ); ?></option>
-					<option value="bigger"<?php selected( $instance['avatar'], 'bigger' ) ?>><?php _e( 'Bigger - 73px by 73px', $this->_slug ); ?></option>
-					<option value="original"<?php selected( $instance['avatar'], 'original' ) ?>><?php _e( 'Original', $this->_slug ); ?></option>
+					<option value=""<?php selected( $instance['avatar'], '' ); ?>><?php _e( 'Do not show', $this->_slug ); ?></option>
+					<option value="mini"<?php selected( $instance['avatar'], 'mini' ); ?>><?php _e( 'Mini - 24px by 24px', $this->_slug ); ?></option>
+					<option value="normal"<?php selected( $instance['avatar'], 'normal' ); ?>><?php _e( 'Normal - 48px by 48px', $this->_slug ); ?></option>
+					<option value="bigger"<?php selected( $instance['avatar'], 'bigger' ); ?>><?php _e( 'Bigger - 73px by 73px', $this->_slug ); ?></option>
+					<option value="original"<?php selected( $instance['avatar'], 'original' ); ?>><?php _e( 'Original', $this->_slug ); ?></option>
 				</select>
 			</p>
 			<p>
@@ -175,13 +179,13 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 			<p>
 				<label for="<?php echo $this->get_field_id( 'showts' ); ?>"><?php _e( 'Show date/time of Tweet ( rather than 2 ____ ago ):', $this->_slug ); ?></label>
 				<select id="<?php echo $this->get_field_id( 'showts' ); ?>" name="<?php echo $this->get_field_name( 'showts' ); ?>">
-					<option value="0" <?php selected( $instance['showts'], '0' ); ?>><?php _e( 'Always', $this->_slug );?></option>
-					<option value="3600" <?php selected( $instance['showts'], '3600' ); ?>><?php _e( 'If over an hour old', $this->_slug );?></option>
-					<option value="86400" <?php selected( $instance['showts'], '86400' ); ?>><?php _e( 'If over a day old', $this->_slug );?></option>
-					<option value="604800" <?php selected( $instance['showts'], '604800' ); ?>><?php _e( 'If over a week old', $this->_slug );?></option>
-					<option value="2592000" <?php selected( $instance['showts'], '2592000' ); ?>><?php _e( 'If over a month old', $this->_slug );?></option>
-					<option value="31536000" <?php selected( $instance['showts'], '31536000' ); ?>><?php _e( 'If over a year old', $this->_slug );?></option>
-					<option value="-1" <?php selected( $instance['showts'], '-1' ); ?>><?php _e( 'Never', $this->_slug );?></option>
+					<option value="0" <?php selected( $instance['showts'], '0' ); ?>><?php _e( 'Always', $this->_slug ); ?></option>
+					<option value="3600" <?php selected( $instance['showts'], '3600' ); ?>><?php _e( 'If over an hour old', $this->_slug ); ?></option>
+					<option value="86400" <?php selected( $instance['showts'], '86400' ); ?>><?php _e( 'If over a day old', $this->_slug ); ?></option>
+					<option value="604800" <?php selected( $instance['showts'], '604800' ); ?>><?php _e( 'If over a week old', $this->_slug ); ?></option>
+					<option value="2592000" <?php selected( $instance['showts'], '2592000' ); ?>><?php _e( 'If over a month old', $this->_slug ); ?></option>
+					<option value="31536000" <?php selected( $instance['showts'], '31536000' ); ?>><?php _e( 'If over a year old', $this->_slug ); ?></option>
+					<option value="-1" <?php selected( $instance['showts'], '-1' ); ?>><?php _e( 'Never', $this->_slug ); ?></option>
 				</select>
 			</p>
 			<p>
@@ -200,14 +204,14 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 			</p>
 			<p><?php echo $wpTwitterWidget->get_support_forum_link(); ?></p>
 			<script type="text/javascript">
-				jQuery( '#<?php echo $this->get_field_id( 'username' ) ?>' ).on( 'change', function() {
-					jQuery('#<?php echo $this->get_field_id( 'list' ) ?>' ).val(0);
+				jQuery( '#<?php echo $this->get_field_id( 'username' ); ?>' ).on( 'change', function() {
+					jQuery('#<?php echo $this->get_field_id( 'list' ); ?>' ).val(0);
 				});
-				jQuery( '#<?php echo $this->get_field_id( 'list' ) ?>' ).on( 'change', function() {
-					jQuery('#<?php echo $this->get_field_id( 'username' ) ?>' ).val(0);
+				jQuery( '#<?php echo $this->get_field_id( 'list' ); ?>' ).on( 'change', function() {
+					jQuery('#<?php echo $this->get_field_id( 'username' ); ?>' ).val(0);
 				});
 			</script>
-<?php
+		<?php
 		return;
 	}
 
@@ -215,12 +219,12 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 		$instance = $this->_getInstanceSettings( $new_instance );
 
 		// Clean up the free-form areas
-		$instance['title'] = stripslashes( $new_instance['title'] );
+		$instance['title']  = stripslashes( $new_instance['title'] );
 		$instance['errmsg'] = stripslashes( $new_instance['errmsg'] );
 
 		// If the current user isn't allowed to use unfiltered HTML, filter it
-		if ( !current_user_can( 'unfiltered_html' ) ) {
-			$instance['title'] = strip_tags( $new_instance['title'] );
+		if ( ! current_user_can( 'unfiltered_html' ) ) {
+			$instance['title']  = strip_tags( $new_instance['title'] );
 			$instance['errmsg'] = strip_tags( $new_instance['errmsg'] );
 		}
 
@@ -232,7 +236,7 @@ class WP_Widget_Twitter_Pro extends WP_Widget {
 	}
 
 	public function widget( $args, $instance ) {
-		$instance = $this->_getInstanceSettings( $instance );
+		$instance        = $this->_getInstanceSettings( $instance );
 		$wpTwitterWidget = wpTwitterWidget::getInstance();
 		echo $wpTwitterWidget->display( wp_parse_args( $instance, $args ) );
 	}
@@ -258,16 +262,16 @@ class wpTwitterWidget extends RangePlugin {
 	protected function _init() {
 		require_once( 'lib/wp-twitter.php' );
 
-		$this->_hook = 'twitterWidgetPro';
-		$this->_file = plugin_basename( __FILE__ );
-		$this->_pageTitle = __( 'Twitter Widget Pro', $this->_slug );
-		$this->_menuTitle = __( 'Twitter Widget', $this->_slug );
-		$this->_accessLevel = 'manage_options';
-		$this->_optionGroup = 'twp-options';
-		$this->_optionNames = array( 'twp' );
+		$this->_hook            = 'twitterWidgetPro';
+		$this->_file            = plugin_basename( __FILE__ );
+		$this->_pageTitle       = __( 'Twitter Widget Pro', $this->_slug );
+		$this->_menuTitle       = __( 'Twitter Widget', $this->_slug );
+		$this->_accessLevel     = 'manage_options';
+		$this->_optionGroup     = 'twp-options';
+		$this->_optionNames     = array( 'twp' );
 		$this->_optionCallbacks = array();
-		$this->_slug = 'twitter-widget-pro';
-		$this->_paypalButtonId = '9993090';
+		$this->_slug            = 'twitter-widget-pro';
+		$this->_paypalButtonId  = '9993090';
 
 		/**
 		 * Add filters and actions
@@ -281,32 +285,34 @@ class wpTwitterWidget extends RangePlugin {
 		add_filter( 'widget_twitter_content', array( $this, 'linkUrls' ) );
 		add_filter( 'widget_twitter_content', array( $this, 'linkHashtags' ) );
 		add_filter( 'widget_twitter_content', 'convert_chars' );
-		add_filter( $this->_slug .'-opt-twp', array( $this, 'filterSettings' ) );
-		add_filter( $this->_slug .'-opt-twp-authed-users', array( $this, 'authed_users_option' ) );
+		add_filter( $this->_slug . '-opt-twp', array( $this, 'filterSettings' ) );
+		add_filter( $this->_slug . '-opt-twp-authed-users', array( $this, 'authed_users_option' ) );
 		add_shortcode( 'twitter-widget', array( $this, 'handleShortcodes' ) );
 
 		$twp_version = get_option( 'twp_version' );
-		if ( TWP_VERSION != $twp_version )
+		if ( TWP_VERSION != $twp_version ) {
 			update_option( 'twp_version', TWP_VERSION );
+		}
 	}
 
 	protected function _post_settings_init() {
-		$oauth_settings = array(
+		$oauth_settings          = array(
 			'consumer-key'    => $this->_settings['twp']['consumer-key'],
 			'consumer-secret' => $this->_settings['twp']['consumer-secret'],
 		);
 		$this->_wp_twitter_oauth = new wpTwitter( $oauth_settings );
 
 		// We want to fill 'twp-authed-users' but not overwrite them when saving
-		$this->_settings['twp-authed-users'] = apply_filters($this->_slug.'-opt-twp-authed-users', get_option('twp-authed-users'));
+		$this->_settings['twp-authed-users'] = apply_filters( $this->_slug . '-opt-twp-authed-users', get_option( 'twp-authed-users' ) );
 	}
 
 	/**
 	 * Function to instantiate our class and make it a singleton
 	 */
 	public static function getInstance() {
-		if ( !self::$instance )
+		if ( ! self::$instance ) {
 			self::$instance = new self;
+		}
 
 		return self::$instance;
 	}
@@ -316,14 +322,15 @@ class wpTwitterWidget extends RangePlugin {
 	}
 
 	public function handle_actions() {
-		if ( empty( $_GET['action'] ) || empty( $_GET['page'] ) || $_GET['page'] != $this->_hook )
+		if ( empty( $_GET['action'] ) || empty( $_GET['page'] ) || $_GET['page'] != $this->_hook ) {
 			return;
+		}
 
 		if ( 'clear-locks' == $_GET['action'] ) {
 			check_admin_referer( 'clear-locks' );
 			$redirect_args = array( 'message' => strtolower( $_GET['action'] ) );
 			global $wpdb;
-			$locks_q = "DELETE FROM `{$wpdb->options}` WHERE `option_name` LIKE '_transient_tlc_up__twp%'";
+			$locks_q                        = "DELETE FROM `{$wpdb->options}` WHERE `option_name` LIKE '_transient_tlc_up__twp%'";
 			$redirect_args['locks_cleared'] = $wpdb->query( $locks_q );
 			wp_safe_redirect( add_query_arg( $redirect_args, remove_query_arg( array( 'action', '_wpnonce' ) ) ) );
 			exit;
@@ -333,11 +340,12 @@ class wpTwitterWidget extends RangePlugin {
 			check_admin_referer( 'remove-' . $_GET['screen_name'] );
 
 			$redirect_args = array(
-				'message'    => 'removed',
+				'message' => 'removed',
 				'removed' => '',
 			);
-			unset( $this->_settings['twp-authed-users'][strtolower($_GET['screen_name'])] );
-			if ( update_option( 'twp-authed-users', $this->_settings['twp-authed-users'] ) );
+			unset( $this->_settings['twp-authed-users'][ strtolower( $_GET['screen_name'] ) ] );
+			if ( update_option( 'twp-authed-users', $this->_settings['twp-authed-users'] ) ) {
+			}
 				$redirect_args['removed'] = $_GET['screen_name'];
 
 			wp_safe_redirect( add_query_arg( $redirect_args, $this->get_options_url() ) );
@@ -346,13 +354,13 @@ class wpTwitterWidget extends RangePlugin {
 		if ( 'authorize' == $_GET['action'] ) {
 			check_admin_referer( 'authorize' );
 			$auth_redirect = add_query_arg( array( 'action' => 'authorized' ), $this->get_options_url() );
-			$token = $this->_wp_twitter_oauth->getRequestToken( $auth_redirect );
+			$token         = $this->_wp_twitter_oauth->getRequestToken( $auth_redirect );
 			if ( is_wp_error( $token ) ) {
 				$this->_error = $token;
 				return;
 			}
-			update_option( '_twp_request_token_'.$token['nonce'], $token );
-			$screen_name = empty( $_GET['screen_name'] )? '':$_GET['screen_name'];
+			update_option( '_twp_request_token_' . $token['nonce'], $token );
+			$screen_name = empty( $_GET['screen_name'] ) ? '' : $_GET['screen_name'];
 			wp_redirect( $this->_wp_twitter_oauth->get_authorize_url( $screen_name ) );
 			exit;
 		}
@@ -361,15 +369,16 @@ class wpTwitterWidget extends RangePlugin {
 				'message'    => strtolower( $_GET['action'] ),
 				'authorized' => '',
 			);
-			if ( empty( $_GET['oauth_verifier'] ) || empty( $_GET['nonce'] ) )
+			if ( empty( $_GET['oauth_verifier'] ) || empty( $_GET['nonce'] ) ) {
 				wp_safe_redirect( add_query_arg( $redirect_args, $this->get_options_url() ) );
+			}
 
-			$this->_wp_twitter_oauth->set_token( get_option( '_twp_request_token_'.$_GET['nonce'] ) );
-			delete_option( '_twp_request_token_'.$_GET['nonce'] );
+			$this->_wp_twitter_oauth->set_token( get_option( '_twp_request_token_' . $_GET['nonce'] ) );
+			delete_option( '_twp_request_token_' . $_GET['nonce'] );
 
 			$token = $this->_wp_twitter_oauth->get_access_token( $_GET['oauth_verifier'] );
 			if ( ! is_wp_error( $token ) ) {
-				$this->_settings['twp-authed-users'][strtolower($token['screen_name'])] = $token;
+				$this->_settings['twp-authed-users'][ strtolower( $token['screen_name'] ) ] = $token;
 				update_option( 'twp-authed-users', $this->_settings['twp-authed-users'] );
 
 				$redirect_args['authorized'] = $token['screen_name'];
@@ -382,23 +391,27 @@ class wpTwitterWidget extends RangePlugin {
 	public function show_messages() {
 		if ( ! empty( $_GET['message'] ) ) {
 			if ( 'clear-locks' == $_GET['message'] ) {
-				if ( empty( $_GET['locks_cleared'] ) || 0 == $_GET['locks_cleared'] )
+				if ( empty( $_GET['locks_cleared'] ) || 0 == $_GET['locks_cleared'] ) {
 					$msg = __( 'There were no locks to clear!', $this->_slug );
-				else
+				} else {
 					$msg = sprintf( _n( 'Successfully cleared %d lock.', 'Successfully cleared %d locks.', $_GET['locks_cleared'], $this->_slug ), $_GET['locks_cleared'] );
+				}
 			} elseif ( 'authorized' == $_GET['message'] ) {
-				if ( ! empty( $_GET['authorized'] ) )
+				if ( ! empty( $_GET['authorized'] ) ) {
 					$msg = sprintf( __( 'Successfully authorized @%s', $this->_slug ), $_GET['authorized'] );
-				else
+				} else {
 					$msg = __( 'There was a problem authorizing your account.', $this->_slug );
+				}
 			} elseif ( 'removed' == $_GET['message'] ) {
-				if ( ! empty( $_GET['removed'] ) )
+				if ( ! empty( $_GET['removed'] ) ) {
 					$msg = sprintf( __( 'Successfully removed @%s', $this->_slug ), $_GET['removed'] );
-				else
+				} else {
 					$msg = __( 'There was a problem removing your account.', $this->_slug );
+				}
 			}
-			if ( ! empty( $msg ) )
+			if ( ! empty( $msg ) ) {
 				echo "<div class='updated'><p>" . esc_html( $msg ) . '</p></div>';
+			}
 		}
 
 		if ( ! empty( $this->_error ) && is_wp_error( $this->_error ) ) {
@@ -431,13 +444,13 @@ class wpTwitterWidget extends RangePlugin {
 			<thead>
 				<tr valign="top">
 					<th scope="row">
-						<?php _e( 'Username', $this->_slug );?>
+						<?php _e( 'Username', $this->_slug ); ?>
 					</th>
 					<th scope="row">
-						<?php _e( 'Lists Rate Usage', $this->_slug );?>
+						<?php _e( 'Lists Rate Usage', $this->_slug ); ?>
 					</th>
 					<th scope="row">
-						<?php _e( 'Statuses Rate Usage', $this->_slug );?>
+						<?php _e( 'Statuses Rate Usage', $this->_slug ); ?>
 					</th>
 				</tr>
 			</thead>
@@ -447,33 +460,33 @@ class wpTwitterWidget extends RangePlugin {
 			$rates = $this->_wp_twitter_oauth->send_authed_request( 'application/rate_limit_status', 'GET', array( 'resources' => 'statuses,lists' ) );
 			$style = $auth_link = '';
 			if ( is_wp_error( $rates ) ) {
-				$query_args = array(
-					'action' => 'authorize',
+				$query_args         = array(
+					'action'      => 'authorize',
 					'screen_name' => $u['screen_name'],
 				);
 				$authorize_user_url = wp_nonce_url( add_query_arg( $query_args ), 'authorize' );
-				$style = 'color:red;';
-				$auth_link = ' - <a href="' . esc_url( $authorize_user_url ) . '">' . __( 'Reauthorize', $this->_slug ) . '</a>';
+				$style              = 'color:red;';
+				$auth_link          = ' - <a href="' . esc_url( $authorize_user_url ) . '">' . __( 'Reauthorize', $this->_slug ) . '</a>';
 			}
-			$query_args = array(
-				'action' => 'remove',
+			$query_args      = array(
+				'action'      => 'remove',
 				'screen_name' => $u['screen_name'],
 			);
 			$remove_user_url = wp_nonce_url( add_query_arg( $query_args ), 'remove-' . $u['screen_name'] );
 			?>
 				<tr valign="top">
 					<th scope="row" style="<?php echo esc_attr( $style ); ?>">
-						<strong>@<?php echo esc_html( $u['screen_name'] ) . $auth_link;?></strong>
-						<br /><a href="<?php echo esc_url( $remove_user_url ) ?>"><?php _e( 'Remove', $this->_slug ) ?></a>
+						<strong>@<?php echo esc_html( $u['screen_name'] ) . $auth_link; ?></strong>
+						<br /><a href="<?php echo esc_url( $remove_user_url ); ?>"><?php _e( 'Remove', $this->_slug ); ?></a>
 					</th>
 					<?php
 					if ( ! is_wp_error( $rates ) ) {
 						$display_rates = array(
-							__( 'Lists', $this->_slug ) => $rates->resources->lists->{'/lists/statuses'},
+							__( 'Lists', $this->_slug )    => $rates->resources->lists->{'/lists/statuses'},
 							__( 'Statuses', $this->_slug ) => $rates->resources->statuses->{'/statuses/user_timeline'},
 						);
 						foreach ( $display_rates as $title => $rate ) {
-						?>
+							?>
 						<td>
 							<strong><?php echo esc_html( $title ); ?></strong>
 							<p>
@@ -482,11 +495,12 @@ class wpTwitterWidget extends RangePlugin {
 								<?php
 								$minutes = ceil( ( $rate->reset - gmdate( 'U' ) ) / 60 );
 								echo sprintf( _n( 'Limits reset in: %d minutes', 'Limits reset in: %d minutes', $minutes, $this->_slug ), $minutes );
-								?><br />
+								?>
+								<br />
 								<small><?php _e( 'This is overall usage, not just usage from Twitter Widget Pro', $this->_slug ); ?></small>
 							</p>
 						</td>
-						<?php
+							<?php
 						}
 					} else {
 						?>
@@ -501,22 +515,22 @@ class wpTwitterWidget extends RangePlugin {
 					?>
 				</tr>
 				<?php
-			}
+		}
 		?>
 		</table>
 		<?php
 		if ( empty( $this->_settings['twp']['consumer-key'] ) || empty( $this->_settings['twp']['consumer-secret'] ) ) {
-		?>
+			?>
 		<p>
-			<strong><?php _e( 'You need to fill in the Consumer key and Consumer secret before you can authorize accounts.', $this->_slug ) ?></strong>
+			<strong><?php _e( 'You need to fill in the Consumer key and Consumer secret before you can authorize accounts.', $this->_slug ); ?></strong>
 		</p>
-		<?php
+			<?php
 		} else {
-		?>
+			?>
 		<p>
-			<a href="<?php echo esc_url( $authorize_url );?>" class="button button-large button-primary"><?php _e( 'Authorize New Account', $this->_slug ); ?></a>
+			<a href="<?php echo esc_url( $authorize_url ); ?>" class="button button-large button-primary"><?php _e( 'Authorize New Account', $this->_slug ); ?></a>
 		</p>
-		<?php
+			<?php
 		}
 	}
 	public function general_settings_meta_box() {
@@ -525,7 +539,7 @@ class wpTwitterWidget extends RangePlugin {
 				<table class="form-table">
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_consumer_key"><?php _e( 'Consumer key', $this->_slug );?></label>
+							<label for="twp_consumer_key"><?php _e( 'Consumer key', $this->_slug ); ?></label>
 						</th>
 						<td>
 							<input id="twp_consumer_key" name="twp[consumer-key]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['consumer-key'] ); ?>" size="40" />
@@ -533,7 +547,7 @@ class wpTwitterWidget extends RangePlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<label for="twp_consumer_secret"><?php _e( 'Consumer secret', $this->_slug );?></label>
+							<label for="twp_consumer_secret"><?php _e( 'Consumer secret', $this->_slug ); ?></label>
 						</th>
 						<td>
 							<input id="twp_consumer_secret" name="twp[consumer-secret]" type="text" class="regular-text code" value="<?php esc_attr_e( $this->_settings['twp']['consumer-secret'] ); ?>" size="40" />
@@ -541,26 +555,26 @@ class wpTwitterWidget extends RangePlugin {
 					</tr>
 					<?php
 					if ( empty( $this->_settings['twp']['consumer-key'] ) || empty( $this->_settings['twp']['consumer-secret'] ) ) {
-					?>
+						?>
 					<tr valign="top">
 						<th scope="row">&nbsp;</th>
 						<td>
-							<strong><?php _e( 'Directions to get the Consumer Key and Consumer Secret', $this->_slug ) ?></strong>
+							<strong><?php _e( 'Directions to get the Consumer Key and Consumer Secret', $this->_slug ); ?></strong>
 							<ol>
-								<li><a href="https://dev.twitter.com/apps/new"><?php _e( 'Add a new Twitter application', $this->_slug ) ?></a></li>
-								<li><?php _e( "Fill in Name, Description, Website, and Callback URL (don't leave any blank) with anything you want" ) ?></a></li>
-								<li><?php _e( "Agree to rules, fill out captcha, and submit your application" ) ?></a></li>
-								<li><?php _e( "Copy the Consumer key and Consumer secret into the fields above" ) ?></a></li>
-								<li><?php _e( "Click the Update Options button at the bottom of this page" ) ?></a></li>
+								<li><a href="https://dev.twitter.com/apps/new"><?php _e( 'Add a new Twitter application', $this->_slug ); ?></a></li>
+								<li><?php _e( "Fill in Name, Description, Website, and Callback URL (don't leave any blank) with anything you want" ); ?></a></li>
+								<li><?php _e( 'Agree to rules, fill out captcha, and submit your application' ); ?></a></li>
+								<li><?php _e( 'Copy the Consumer key and Consumer secret into the fields above' ); ?></a></li>
+								<li><?php _e( 'Click the Update Options button at the bottom of this page' ); ?></a></li>
 							</ol>
 						</td>
 					</tr>
-					<?php
+						<?php
 					}
 					?>
 					<tr>
 						<th scope="row">
-							<?php _e( "Clear Update Locks", $this->_slug );?>
+							<?php _e( 'Clear Update Locks', $this->_slug ); ?>
 						</th>
 						<td>
 							<a href="<?php echo esc_url( $clear_locks_url ); ?>"><?php _e( 'Clear Update Locks', $this->_slug ); ?></a><br />
@@ -573,25 +587,34 @@ class wpTwitterWidget extends RangePlugin {
 						</th>
 						<td>
 						<?php
-							if ( ! empty( $_GET['action'] ) && 'test-local-request' == $_GET['action'] ) {
-								check_admin_referer( 'test-local-request' );
+						if ( ! empty( $_GET['action'] ) && 'test-local-request' == $_GET['action'] ) {
+							check_admin_referer( 'test-local-request' );
 
-								$server_url = home_url( '/?twp-test-local-request' );
-								$resp = wp_remote_post( $server_url, array( 'body' => array( '_wpnonce' => wp_create_nonce( 'twp-test-local-request' ), 'uid' => get_current_user_id() ), 'sslverify' => apply_filters( 'https_local_ssl_verify', true ) ) );
-								if ( !is_wp_error( $resp ) && $resp['response']['code'] >= 200 && $resp['response']['code'] < 300 ) {
-									if ( 'success' == wp_remote_retrieve_body( $resp ) )
-										_e( '<p style="color:green;">Local requests appear to be functioning normally.</p>', $this->_slug );
-									else
-										_e( '<p style="color:red;">The request went through, but an unexpected response was received.</p>', $this->_slug );
+							$server_url = home_url( '/?twp-test-local-request' );
+							$resp       = wp_remote_post(
+								$server_url, array(
+									'body'      => array(
+										'_wpnonce' => wp_create_nonce( 'twp-test-local-request' ),
+										'uid'      => get_current_user_id(),
+									),
+									'sslverify' => apply_filters( 'https_local_ssl_verify', true ),
+								)
+							);
+							if ( ! is_wp_error( $resp ) && $resp['response']['code'] >= 200 && $resp['response']['code'] < 300 ) {
+								if ( 'success' == wp_remote_retrieve_body( $resp ) ) {
+									_e( '<p style="color:green;">Local requests appear to be functioning normally.</p>', $this->_slug );
 								} else {
-									printf( __( '<p style="color:red;">Failed.  Your server said: %s</p>', $this->_slug ), $resp['response']['message'] );
+									_e( '<p style="color:red;">The request went through, but an unexpected response was received.</p>', $this->_slug );
 								}
+							} else {
+								printf( __( '<p style="color:red;">Failed.  Your server said: %s</p>', $this->_slug ), $resp['response']['message'] );
 							}
-							$query_args = array(
+						}
+							$query_args     = array(
 								'action' => 'test-local-request',
 							);
 							$test_local_url = wp_nonce_url( add_query_arg( $query_args, $this->get_options_url() ), 'test-local-request' );
-							?>
+						?>
 							<a href="<?php echo esc_url( $test_local_url ); ?>" class="button">
 								<?php _e( 'Test local requests', $this->_slug ); ?>
 							</a><br />
@@ -605,7 +628,7 @@ class wpTwitterWidget extends RangePlugin {
 		$users = $this->get_users_list( true );
 		$lists = $this->get_lists();
 		?>
-				<p><?php _e( 'These settings are the default for the shortcodes and all of them can be overridden by specifying a different value in the shortcode itself.  All settings for widgets are locate in the individual widget.', $this->_slug ) ?></p>
+				<p><?php _e( 'These settings are the default for the shortcodes and all of them can be overridden by specifying a different value in the shortcode itself.  All settings for widgets are locate in the individual widget.', $this->_slug ); ?></p>
 				<table class="form-table">
 					<tr valign="top">
 						<th scope="row">
@@ -618,17 +641,18 @@ class wpTwitterWidget extends RangePlugin {
 								$selected = false;
 								foreach ( $users as $u ) {
 									?>
-									<option value="<?php echo esc_attr( strtolower( $u['screen_name'] ) ); ?>"<?php $s = selected( strtolower( $u['screen_name'] ), strtolower( $this->_settings['twp']['username'] ) ) ?>><?php echo esc_html( $u['screen_name'] ); ?></option>
+									<option value="<?php echo esc_attr( strtolower( $u['screen_name'] ) ); ?>"<?php $s = selected( strtolower( $u['screen_name'] ), strtolower( $this->_settings['twp']['username'] ) ); ?>><?php echo esc_html( $u['screen_name'] ); ?></option>
 									<?php
-									if ( ! empty( $s ) )
+									if ( ! empty( $s ) ) {
 										$selected = true;
+									}
 								}
 								?>
 							</select>
 							<?php
 							if ( ! $selected && ! empty( $this->_settings['twp']['username'] ) ) {
-								$query_args = array(
-									'action' => 'authorize',
+								$query_args         = array(
+									'action'      => 'authorize',
 									'screen_name' => $this->_settings['twp']['username'],
 								);
 								$authorize_user_url = wp_nonce_url( add_query_arg( $query_args, $this->get_options_url() ), 'authorize' );
@@ -655,7 +679,7 @@ class wpTwitterWidget extends RangePlugin {
 									echo '<optgroup label="' . esc_attr( $user ) . '">';
 									foreach ( $user_lists as $list_id => $list_name ) {
 										?>
-										<option value="<?php echo esc_attr( $user . '::' . $list_id ); ?>"<?php $s = selected( $user . '::' . $list_id, strtolower( $this->_settings['twp']['list'] ) ) ?>><?php echo esc_html( $list_name ); ?></option>
+										<option value="<?php echo esc_attr( $user . '::' . $list_id ); ?>"<?php $s = selected( $user . '::' . $list_id, strtolower( $this->_settings['twp']['list'] ) ); ?>><?php echo esc_html( $list_name ); ?></option>
 										<?php
 									}
 									echo '</optgroup>';
@@ -679,9 +703,9 @@ class wpTwitterWidget extends RangePlugin {
 						<td>
 							<select id="twp_items" name="twp[items]">
 								<?php
-									for ( $i = 1; $i <= 20; ++$i ) {
-										echo "<option value='$i' ". selected( $this->_settings['twp']['items'], $i, false ). ">$i</option>";
-									}
+								for ( $i = 1; $i <= 20; ++$i ) {
+									echo "<option value='$i' " . selected( $this->_settings['twp']['items'], $i, false ) . ">$i</option>";
+								}
 								?>
 							</select>
 						</td>
@@ -692,11 +716,11 @@ class wpTwitterWidget extends RangePlugin {
 						</th>
 						<td>
 							<select id="twp_avatar" name="twp[avatar]">
-								<option value=""<?php selected( $this->_settings['twp']['avatar'], '' ) ?>><?php _e( 'Do not show', $this->_slug ); ?></option>
-								<option value="mini"<?php selected( $this->_settings['twp']['avatar'], 'mini' ) ?>><?php _e( 'Mini - 24px by 24px', $this->_slug ); ?></option>
-								<option value="normal"<?php selected( $this->_settings['twp']['avatar'], 'normal' ) ?>><?php _e( 'Normal - 48px by 48px', $this->_slug ); ?></option>
-								<option value="bigger"<?php selected( $this->_settings['twp']['avatar'], 'bigger' ) ?>><?php _e( 'Bigger - 73px by 73px', $this->_slug ); ?></option>
-								<option value="original"<?php selected( $this->_settings['twp']['avatar'], 'original' ) ?>><?php _e( 'Original', $this->_slug ); ?></option>
+								<option value=""<?php selected( $this->_settings['twp']['avatar'], '' ); ?>><?php _e( 'Do not show', $this->_slug ); ?></option>
+								<option value="mini"<?php selected( $this->_settings['twp']['avatar'], 'mini' ); ?>><?php _e( 'Mini - 24px by 24px', $this->_slug ); ?></option>
+								<option value="normal"<?php selected( $this->_settings['twp']['avatar'], 'normal' ); ?>><?php _e( 'Normal - 48px by 48px', $this->_slug ); ?></option>
+								<option value="bigger"<?php selected( $this->_settings['twp']['avatar'], 'bigger' ); ?>><?php _e( 'Bigger - 73px by 73px', $this->_slug ); ?></option>
+								<option value="original"<?php selected( $this->_settings['twp']['avatar'], 'original' ); ?>><?php _e( 'Original', $this->_slug ); ?></option>
 							</select>
 						</td>
 					</tr>
@@ -714,13 +738,13 @@ class wpTwitterWidget extends RangePlugin {
 						</th>
 						<td>
 							<select id="twp_showts" name="twp[showts]">
-								<option value="0" <?php selected( $this->_settings['twp']['showts'], '0' ); ?>><?php _e( 'Always', $this->_slug );?></option>
-								<option value="3600" <?php selected( $this->_settings['twp']['showts'], '3600' ); ?>><?php _e( 'If over an hour old', $this->_slug );?></option>
-								<option value="86400" <?php selected( $this->_settings['twp']['showts'], '86400' ); ?>><?php _e( 'If over a day old', $this->_slug );?></option>
-								<option value="604800" <?php selected( $this->_settings['twp']['showts'], '604800' ); ?>><?php _e( 'If over a week old', $this->_slug );?></option>
-								<option value="2592000" <?php selected( $this->_settings['twp']['showts'], '2592000' ); ?>><?php _e( 'If over a month old', $this->_slug );?></option>
-								<option value="31536000" <?php selected( $this->_settings['twp']['showts'], '31536000' ); ?>><?php _e( 'If over a year old', $this->_slug );?></option>
-								<option value="-1" <?php selected( $this->_settings['twp']['showts'], '-1' ); ?>><?php _e( 'Never', $this->_slug );?></option>
+								<option value="0" <?php selected( $this->_settings['twp']['showts'], '0' ); ?>><?php _e( 'Always', $this->_slug ); ?></option>
+								<option value="3600" <?php selected( $this->_settings['twp']['showts'], '3600' ); ?>><?php _e( 'If over an hour old', $this->_slug ); ?></option>
+								<option value="86400" <?php selected( $this->_settings['twp']['showts'], '86400' ); ?>><?php _e( 'If over a day old', $this->_slug ); ?></option>
+								<option value="604800" <?php selected( $this->_settings['twp']['showts'], '604800' ); ?>><?php _e( 'If over a week old', $this->_slug ); ?></option>
+								<option value="2592000" <?php selected( $this->_settings['twp']['showts'], '2592000' ); ?>><?php _e( 'If over a month old', $this->_slug ); ?></option>
+								<option value="31536000" <?php selected( $this->_settings['twp']['showts'], '31536000' ); ?>><?php _e( 'If over a year old', $this->_slug ); ?></option>
+								<option value="-1" <?php selected( $this->_settings['twp']['showts'], '-1' ); ?>><?php _e( 'Never', $this->_slug ); ?></option>
 							</select>
 						</td>
 					</tr>
@@ -734,7 +758,7 @@ class wpTwitterWidget extends RangePlugin {
 					</tr>
 					<tr valign="top">
 						<th scope="row">
-							<?php _e( "Other Setting:", $this->_slug );?>
+							<?php _e( 'Other Setting:', $this->_slug ); ?>
 						</th>
 						<td>
 							<input type="hidden" value="false" name="twp[showretweets]" />
@@ -781,16 +805,16 @@ class wpTwitterWidget extends RangePlugin {
 	 * @return string - Tweet text with @replies linked
 	 */
 	public function linkTwitterUsers( $text ) {
-		$text = preg_replace_callback('/(^|\s)@(\w+)/i', array($this, '_linkTwitterUsersCallback'), $text);
+		$text = preg_replace_callback( '/(^|\s)@(\w+)/i', array( $this, '_linkTwitterUsersCallback' ), $text );
 		return $text;
 	}
 
 	private function _linkTwitterUsersCallback( $matches ) {
 		$linkAttrs = array(
-			'href'	=> 'http://twitter.com/' . urlencode( $matches[2] ),
-			'class'	=> 'twitter-user'
+			'href'  => 'http://twitter.com/' . urlencode( $matches[2] ),
+			'class' => 'twitter-user',
 		);
-		return $matches[1] . $this->_buildLink( '@'.$matches[2], $linkAttrs );
+		return $matches[1] . $this->_buildLink( '@' . $matches[2], $linkAttrs );
 	}
 
 	/**
@@ -800,7 +824,7 @@ class wpTwitterWidget extends RangePlugin {
 	 * @return string - Tweet text with #hashtags linked
 	 */
 	public function linkHashtags( $text ) {
-		$text = preg_replace_callback('/(^|\s)(#[\w\x{00C0}-\x{00D6}\x{00D8}-\x{00F6}\x{00F8}-\x{00FF}]+)/iu', array($this, '_linkHashtagsCallback'), $text);
+		$text = preg_replace_callback( '/(^|\s)(#[\w\x{00C0}-\x{00D6}\x{00D8}-\x{00F6}\x{00F8}-\x{00FF}]+)/iu', array( $this, '_linkHashtagsCallback' ), $text );
 		return $text;
 	}
 
@@ -812,8 +836,8 @@ class wpTwitterWidget extends RangePlugin {
 	 */
 	private function _linkHashtagsCallback( $matches ) {
 		$linkAttrs = array(
-			'href'	=> 'http://twitter.com/search?q=' . urlencode( $matches[2] ),
-			'class'	=> 'twitter-hashtag'
+			'href'  => 'http://twitter.com/search?q=' . urlencode( $matches[2] ),
+			'class' => 'twitter-hashtag',
 		);
 		return $matches[1] . $this->_buildLink( $matches[2], $linkAttrs );
 	}
@@ -843,52 +867,53 @@ class wpTwitterWidget extends RangePlugin {
 		// The regex is a non-anchored pattern and does not have a single fixed starting character.
 		// Tell PCRE to spend more time optimizing since, when used on a page load, it will probably be used several times.
 
-		$text = preg_replace_callback( $url_clickable, array($this, '_make_url_clickable_cb'), $text );
+		$text = preg_replace_callback( $url_clickable, array( $this, '_make_url_clickable_cb' ), $text );
 
-		$text = preg_replace_callback( '#([\s>])((www|ftp)\.[\w\\x80-\\xff\#$%&~/.\-;:=,?@\[\]+]+)#is', array($this, '_make_web_ftp_clickable_cb' ), $text );
-		$text = preg_replace_callback( '#([\s>])([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})#i', array($this, '_make_email_clickable_cb' ), $text );
+		$text = preg_replace_callback( '#([\s>])((www|ftp)\.[\w\\x80-\\xff\#$%&~/.\-;:=,?@\[\]+]+)#is', array( $this, '_make_web_ftp_clickable_cb' ), $text );
+		$text = preg_replace_callback( '#([\s>])([.0-9a-z_+-]+)@(([0-9a-z-]+\.)+[0-9a-z]{2,})#i', array( $this, '_make_email_clickable_cb' ), $text );
 
 		$text = substr( $text, 1, -1 ); // Remove our whitespace padding.
 
 		return $text;
 	}
 
-	function _make_web_ftp_clickable_cb($matches) {
-		$ret = '';
+	function _make_web_ftp_clickable_cb( $matches ) {
+		$ret  = '';
 		$dest = $matches[2];
 		$dest = 'http://' . $dest;
-		$dest = esc_url($dest);
-		if ( empty($dest) )
+		$dest = esc_url( $dest );
+		if ( empty( $dest ) ) {
 			return $matches[0];
+		}
 
 		// removed trailing [.,;:)] from URL
-		if ( in_array( substr($dest, -1), array('.', ',', ';', ':', ')') ) === true ) {
-			$ret = substr($dest, -1);
-			$dest = substr($dest, 0, strlen($dest)-1);
+		if ( in_array( substr( $dest, -1 ), array( '.', ',', ';', ':', ')' ) ) === true ) {
+			$ret  = substr( $dest, -1 );
+			$dest = substr( $dest, 0, strlen( $dest ) - 1 );
 		}
 		$linkAttrs = array(
-			'href'	=> $dest
+			'href' => $dest,
 		);
 		return $matches[1] . $this->_buildLink( $dest, $linkAttrs ) . $ret;
 	}
 
 	private function _make_email_clickable_cb( $matches ) {
-		$email = $matches[2] . '@' . $matches[3];
+		$email     = $matches[2] . '@' . $matches[3];
 		$linkAttrs = array(
-			'href'	=> 'mailto:' . $email
+			'href' => 'mailto:' . $email,
 		);
 		return $matches[1] . $this->_buildLink( $email, $linkAttrs );
 	}
 
-	private function _make_url_clickable_cb ( $matches ) {
+	private function _make_url_clickable_cb( $matches ) {
 		$linkAttrs = array(
-			'href'	=> $matches[2]
+			'href' => $matches[2],
 		);
 		return $matches[1] . $this->_buildLink( $matches[2], $linkAttrs );
 	}
 
 	private function _notEmpty( $v ) {
-		return !( empty( $v ) );
+		return ! ( empty( $v ) );
 	}
 
 	private function _buildLink( $text, $attributes = array(), $noFilter = false ) {
@@ -896,17 +921,18 @@ class wpTwitterWidget extends RangePlugin {
 		$attributes = apply_filters( 'widget_twitter_link_attributes', $attributes );
 		$attributes = wp_parse_args( $attributes );
 
-		$text = apply_filters( 'widget_twitter_link_text', $text );
+		$text     = apply_filters( 'widget_twitter_link_text', $text );
 		$noFilter = apply_filters( 'widget_twitter_link_nofilter', $noFilter );
-		$link = '<a';
+		$link     = '<a';
 		foreach ( $attributes as $name => $value ) {
 			$link .= ' ' . esc_attr( $name ) . '="' . esc_attr( $value ) . '"';
 		}
 		$link .= '>';
-		if ( $noFilter )
+		if ( $noFilter ) {
 			$link .= $text;
-		else
+		} else {
 			$link .= esc_html( $text );
+		}
 
 		$link .= '</a>';
 		return $link;
@@ -926,30 +952,35 @@ class wpTwitterWidget extends RangePlugin {
 	public function display( $args ) {
 		$args = wp_parse_args( $args );
 
-		if ( 'true' == $args['targetBlank'] )
+		if ( 'true' == $args['targetBlank'] ) {
 			add_filter( 'widget_twitter_link_attributes', array( $this, 'targetBlank' ) );
+		}
 
 		// Validate our options
 		$args['items'] = (int) $args['items'];
-		if ( $args['items'] < 1 || 20 < $args['items'] )
+		if ( $args['items'] < 1 || 20 < $args['items'] ) {
 			$args['items'] = 10;
+		}
 
-		if ( !isset( $args['showts'] ) )
+		if ( ! isset( $args['showts'] ) ) {
 			$args['showts'] = 86400;
+		}
 
 		$tweets = $this->_getTweets( $args );
-		if ( false === $tweets )
+		if ( false === $tweets ) {
 			return '';
+		}
 
 		$widgetContent = $args['before_widget'] . '<div>';
 
-		if ( empty( $args['title'] ) )
+		if ( empty( $args['title'] ) ) {
 			$args['title'] = sprintf( __( 'Twitter: %s', $this->_slug ), $args['username'] );
+		}
 
-		$args['title'] = apply_filters( 'twitter-widget-title', $args['title'], $args );
-		$args['title'] = "<span class='twitterwidget twitterwidget-title'>{$args['title']}</span>";
+		$args['title']  = apply_filters( 'twitter-widget-title', $args['title'], $args );
+		$args['title']  = "<span class='twitterwidget twitterwidget-title'>{$args['title']}</span>";
 		$widgetContent .= $args['before_title'] . $args['title'] . $args['after_title'];
-		if ( !empty( $tweets[0] ) && is_object( $tweets[0] ) && !empty( $args['avatar'] ) ) {
+		if ( ! empty( $tweets[0] ) && is_object( $tweets[0] ) && ! empty( $args['avatar'] ) ) {
 			$widgetContent .= '<div class="twitter-avatar">';
 			$widgetContent .= $this->_getProfileImage( $tweets[0]->user, $args );
 			$widgetContent .= '</div>';
@@ -961,78 +992,81 @@ class wpTwitterWidget extends RangePlugin {
 			$count = 0;
 			foreach ( $tweets as $tweet ) {
 				// Set our "ago" string which converts the date to "# ___(s) ago"
-				$tweet->ago = $this->_timeSince( strtotime( $tweet->created_at ), $args['showts'], $args['dateFormat'] );
-				$entryContent = apply_filters( 'widget_twitter_content', $tweet->text, $tweet );
+				$tweet->ago     = $this->_timeSince( strtotime( $tweet->created_at ), $args['showts'], $args['dateFormat'] );
+				$entryContent   = apply_filters( 'widget_twitter_content', $tweet->text, $tweet );
 				$widgetContent .= '<li>';
 				$widgetContent .= "<span class='entry-content'>{$entryContent}</span>";
 				$widgetContent .= " <span class='entry-meta'>";
 				$widgetContent .= "<span class='time-meta'>";
-				$linkAttrs = array(
-					'href'	=> "http://twitter.com/{$tweet->user->screen_name}/statuses/{$tweet->id_str}"
+				$linkAttrs      = array(
+					'href' => "http://twitter.com/{$tweet->user->screen_name}/statuses/{$tweet->id_str}",
 				);
 				$widgetContent .= $this->_buildLink( $tweet->ago, $linkAttrs );
 				$widgetContent .= '</span>';
 
 				if ( 'true' != $args['hidefrom'] ) {
-					$from = sprintf( __( 'from %s', $this->_slug ), str_replace( '&', '&amp;', $tweet->source ) );
+					$from           = sprintf( __( 'from %s', $this->_slug ), str_replace( '&', '&amp;', $tweet->source ) );
 					$widgetContent .= " <span class='from-meta'>{$from}</span>";
 				}
-				if ( !empty( $tweet->in_reply_to_screen_name ) ) {
-					$rtLinkText = sprintf( __( 'in reply to %s', $this->_slug ), $tweet->in_reply_to_screen_name );
-					$widgetContent .=  ' <span class="in-reply-to-meta">';
-					$linkAttrs = array(
-						'href'	=> "http://twitter.com/{$tweet->in_reply_to_screen_name}/statuses/{$tweet->in_reply_to_status_id_str}",
-						'class'	=> 'reply-to'
+				if ( ! empty( $tweet->in_reply_to_screen_name ) ) {
+					$rtLinkText     = sprintf( __( 'in reply to %s', $this->_slug ), $tweet->in_reply_to_screen_name );
+					$widgetContent .= ' <span class="in-reply-to-meta">';
+					$linkAttrs      = array(
+						'href'  => "http://twitter.com/{$tweet->in_reply_to_screen_name}/statuses/{$tweet->in_reply_to_status_id_str}",
+						'class' => 'reply-to',
 					);
 					$widgetContent .= $this->_buildLink( $rtLinkText, $linkAttrs );
 					$widgetContent .= '</span>';
 				}
- 				$widgetContent .= '</span>';
+				$widgetContent .= '</span>';
 
 				if ( 'true' == $args['showintents'] ) {
 					$widgetContent .= ' <span class="intent-meta">';
-					$lang = $this->_getTwitterLang();
-					if ( !empty( $lang ) )
+					$lang           = $this->_getTwitterLang();
+					if ( ! empty( $lang ) ) {
 						$linkAttrs['data-lang'] = $lang;
+					}
 
-					$linkText = __( 'Reply', $this->_slug );
-					$linkAttrs['href'] = "http://twitter.com/intent/tweet?in_reply_to={$tweet->id_str}";
+					$linkText           = __( 'Reply', $this->_slug );
+					$linkAttrs['href']  = "http://twitter.com/intent/tweet?in_reply_to={$tweet->id_str}";
 					$linkAttrs['class'] = 'in-reply-to';
 					$linkAttrs['title'] = $linkText;
-					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
+					$widgetContent     .= $this->_buildLink( $linkText, $linkAttrs );
 
-					$linkText = __( 'Retweet', $this->_slug );
-					$linkAttrs['href'] = "http://twitter.com/intent/retweet?tweet_id={$tweet->id_str}";
+					$linkText           = __( 'Retweet', $this->_slug );
+					$linkAttrs['href']  = "http://twitter.com/intent/retweet?tweet_id={$tweet->id_str}";
 					$linkAttrs['class'] = 'retweet';
 					$linkAttrs['title'] = $linkText;
-					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
+					$widgetContent     .= $this->_buildLink( $linkText, $linkAttrs );
 
-					$linkText = __( 'Favorite', $this->_slug );
-					$linkAttrs['href'] = "http://twitter.com/intent/favorite?tweet_id={$tweet->id_str}";
+					$linkText           = __( 'Favorite', $this->_slug );
+					$linkAttrs['href']  = "http://twitter.com/intent/favorite?tweet_id={$tweet->id_str}";
 					$linkAttrs['class'] = 'favorite';
 					$linkAttrs['title'] = $linkText;
-					$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
-					$widgetContent .= '</span>';
+					$widgetContent     .= $this->_buildLink( $linkText, $linkAttrs );
+					$widgetContent     .= '</span>';
 				}
 				$widgetContent .= '</li>';
 
-				if ( ++$count >= $args['items'] )
+				if ( ++$count >= $args['items'] ) {
 					break;
+				}
 			}
 		}
 
 		$widgetContent .= '</ul>';
 		if ( 'true' == $args['showfollow'] && ! empty( $args['username'] ) ) {
 			$widgetContent .= '<div class="follow-button">';
-			$linkText = "@{$args['username']}";
-			$linkAttrs = array(
-				'href'	=> "http://twitter.com/{$args['username']}",
-				'class'	=> 'twitter-follow-button',
-				'title'	=> sprintf( __( 'Follow %s', $this->_slug ), "@{$args['username']}" ),
+			$linkText       = "@{$args['username']}";
+			$linkAttrs      = array(
+				'href'  => "http://twitter.com/{$args['username']}",
+				'class' => 'twitter-follow-button',
+				'title' => sprintf( __( 'Follow %s', $this->_slug ), "@{$args['username']}" ),
 			);
-			$lang = $this->_getTwitterLang();
-			if ( !empty( $lang ) )
+			$lang           = $this->_getTwitterLang();
+			if ( ! empty( $lang ) ) {
 				$linkAttrs['data-lang'] = $lang;
+			}
 
 			$widgetContent .= $this->_buildLink( $linkText, $linkAttrs );
 			$widgetContent .= '</div>';
@@ -1040,9 +1074,9 @@ class wpTwitterWidget extends RangePlugin {
 
 		if ( 'true' == $args['showXavisysLink'] ) {
 			$widgetContent .= '<div class="range-link"><span class="range-link-text">';
-			$linkAttrs = array(
-				'href'	=> 'http://bluedogwebservices.com/wordpress-plugin/twitter-widget-pro/',
-				'title'	=> __( 'Brought to you by Range - A WordPress design and development company', $this->_slug )
+			$linkAttrs      = array(
+				'href'  => 'http://bluedogwebservices.com/wordpress-plugin/twitter-widget-pro/',
+				'title' => __( 'Brought to you by Range - A WordPress design and development company', $this->_slug ),
 			);
 			$widgetContent .= __( 'Powered by', $this->_slug );
 			$widgetContent .= $this->_buildLink( 'WordPress Twitter Widget Pro', $linkAttrs );
@@ -1052,8 +1086,9 @@ class wpTwitterWidget extends RangePlugin {
 
 		if ( 'true' == $args['showintents'] || 'true' == $args['showfollow'] ) {
 			$script = 'http://platform.twitter.com/widgets.js';
-			if ( is_ssl() )
+			if ( is_ssl() ) {
 				$script = str_replace( 'http://', 'https://', $script );
+			}
 			wp_enqueue_script( 'twitter-widgets', $script, array(), '1.0.0', true );
 
 			if ( ! function_exists( '_wp_footer_scripts' ) ) {
@@ -1073,10 +1108,11 @@ class wpTwitterWidget extends RangePlugin {
 			'ko', // Korean
 			'ja', // Japanese
 		);
-		$locale = get_locale();
-		$lang = strtolower( substr( get_locale(), 0, 2 ) );
-		if ( in_array( $lang, $valid_langs ) )
+		$locale      = get_locale();
+		$lang        = strtolower( substr( get_locale(), 0, 2 ) );
+		if ( in_array( $lang, $valid_langs ) ) {
 			return $lang;
+		}
 
 		return false;
 	}
@@ -1108,57 +1144,60 @@ class wpTwitterWidget extends RangePlugin {
 	 */
 	public function parseFeed( $widgetOptions ) {
 		$parameters = $this->_get_feed_request_settings( $widgetOptions );
-		$response = $user_timeline = $mentions_timeline = $merged_timeline = array();
+		$response   = $user_timeline = $mentions_timeline = $merged_timeline = array();
 
 		if ( ! empty( $parameters['screen_name'] ) ) {
-			if ( empty( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] ) ) {
-				if ( empty( $widgetOptions['errmsg'] ) )
+			if ( empty( $this->_settings['twp-authed-users'][ strtolower( $parameters['screen_name'] ) ] ) ) {
+				if ( empty( $widgetOptions['errmsg'] ) ) {
 					$widgetOptions['errmsg'] = __( 'Account needs to be authorized', $this->_slug );
+				}
 			} else {
-				$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][strtolower( $parameters['screen_name'] )] );
+				$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][ strtolower( $parameters['screen_name'] ) ] );
 				$user_timeline = $this->_wp_twitter_oauth->send_authed_request( 'statuses/user_timeline', 'GET', $parameters );
 				if ( 'true' == $widgetOptions['showmentions'] ) {
 					$mentions_timeline = $this->_wp_twitter_oauth->send_authed_request( 'statuses/mentions_timeline', 'GET', $parameters );
-					if ( ! is_wp_error( $user_timeline ) && ! is_wp_error( $mentions_timeline )) {
-						$merged_timeline = array_merge_recursive($user_timeline,$mentions_timeline);
-						if (usort($merged_timeline,array($this,"_created_at_compare"))) {
+					if ( ! is_wp_error( $user_timeline ) && ! is_wp_error( $mentions_timeline ) ) {
+						$merged_timeline = array_merge_recursive( $user_timeline, $mentions_timeline );
+						if ( usort( $merged_timeline, array( $this, '_created_at_compare' ) ) ) {
 							return $merged_timeline;
 						}
 					}
-				} else if ( ! is_wp_error( $user_timeline ) ) {
+				} elseif ( ! is_wp_error( $user_timeline ) ) {
 						return $user_timeline;
 				}
 			}
 		} elseif ( ! empty( $parameters['list_id'] ) ) {
 			$list_info = explode( '::', $widgetOptions['list'] );
-			$user = array_shift( $list_info );
-			$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][strtolower( $user )] );
+			$user      = array_shift( $list_info );
+			$this->_wp_twitter_oauth->set_token( $this->_settings['twp-authed-users'][ strtolower( $user ) ] );
 
 			$response = $this->_wp_twitter_oauth->send_authed_request( 'lists/statuses', 'GET', $parameters );
-			if ( ! is_wp_error( $response ) )
+			if ( ! is_wp_error( $response ) ) {
 				return $response;
+			}
 		}
 
-		if ( empty( $widgetOptions['errmsg'] ) )
+		if ( empty( $widgetOptions['errmsg'] ) ) {
 			$widgetOptions['errmsg'] = __( 'Invalid Twitter Response.', $this->_slug );
+		}
 		do_action( 'widget_twitter_parsefeed_error', $response, $parameters, $widgetOptions );
 		throw new Exception( $widgetOptions['errmsg'] );
 	}
 
 	/**
 	 * Helper function used by usort in parseFeed to sort JSON feed, decending, by date (newest first)
-	 * @param  array $a 
-	 * @param  array $b 
-	 * @return int    
+	 * @param  array $a
+	 * @param  array $b
+	 * @return int
 	 */
-    private function _created_at_compare($a, $b) {
-	    $acreated = strtotime($a->created_at);
-	    $bcreated = strtotime($b->created_at);
-	    
-	    if ($acreated == $bcreated) {
-		     return 0;
-	    }
-	    return ($acreated > $bcreated) ? -1 : 1;    
+	private function _created_at_compare( $a, $b ) {
+		$acreated = strtotime( $a->created_at );
+		$bcreated = strtotime( $b->created_at );
+
+		if ( $acreated == $bcreated ) {
+			 return 0;
+		}
+		return ( $acreated > $bcreated ) ? -1 : 1;
 	}
 
 	/**
@@ -1183,21 +1222,23 @@ class wpTwitterWidget extends RangePlugin {
 		 */
 
 		$parameters = array(
-			'count'       => $widgetOptions['items'],
+			'count' => $widgetOptions['items'],
 		);
 
 		if ( ! empty( $widgetOptions['username'] ) ) {
 			$parameters['screen_name'] = $widgetOptions['username'];
 		} elseif ( ! empty( $widgetOptions['list'] ) ) {
-			$list_info = explode( '::', $widgetOptions['list'] );
+			$list_info             = explode( '::', $widgetOptions['list'] );
 			$parameters['list_id'] = array_pop( $list_info );
 		}
 
-		if ( 'true' == $widgetOptions['hidereplies'] )
+		if ( 'true' == $widgetOptions['hidereplies'] ) {
 			$parameters['exclude_replies'] = 'true';
+		}
 
-		if ( 'true' != $widgetOptions['showretweets'] )
+		if ( 'true' != $widgetOptions['showretweets'] ) {
 			$parameters['include_rts'] = 'false';
+		}
 
 		return $parameters;
 
@@ -1222,32 +1263,33 @@ class wpTwitterWidget extends RangePlugin {
 			'day'    => 60 * 60 * 24,       // 86,400 seconds
 			'hour'   => 60 * 60,            // 3600 seconds
 			'minute' => 60,                 // 60 seconds
-			'second' => 1                   // 1 second
+			'second' => 1,                   // 1 second
 		);
 
 		$since = time() - $startTimestamp;
 
-		if ( $max != '-1' && $since >= $max )
-			return date_i18n( $dateFormat, $startTimestamp + get_option('gmt_offset') * 3600 );
-
+		if ( $max != '-1' && $since >= $max ) {
+			return date_i18n( $dateFormat, $startTimestamp + get_option( 'gmt_offset' ) * 3600 );
+		}
 
 		foreach ( $chunks as $key => $seconds ) {
 			// finding the biggest chunk ( if the chunk fits, break )
-			if ( ( $count = floor( $since / $seconds ) ) != 0 )
+			if ( ( $count = floor( $since / $seconds ) ) != 0 ) {
 				break;
+			}
 		}
 
 		$messages = array(
-			'year'   => _n( 'about %s year ago',   'about %s years ago',   $count, $this->_slug ),
-			'month'  => _n( 'about %s month ago',  'about %s months ago',  $count, $this->_slug ),
-			'week'   => _n( 'about %s week ago',   'about %s weeks ago',   $count, $this->_slug ),
-			'day'    => _n( 'about %s day ago',    'about %s days ago',    $count, $this->_slug ),
-			'hour'   => _n( 'about %s hour ago',   'about %s hours ago',   $count, $this->_slug ),
+			'year'   => _n( 'about %s year ago', 'about %s years ago', $count, $this->_slug ),
+			'month'  => _n( 'about %s month ago', 'about %s months ago', $count, $this->_slug ),
+			'week'   => _n( 'about %s week ago', 'about %s weeks ago', $count, $this->_slug ),
+			'day'    => _n( 'about %s day ago', 'about %s days ago', $count, $this->_slug ),
+			'hour'   => _n( 'about %s hour ago', 'about %s hours ago', $count, $this->_slug ),
 			'minute' => _n( 'about %s minute ago', 'about %s minutes ago', $count, $this->_slug ),
 			'second' => _n( 'about %s second ago', 'about %s seconds ago', $count, $this->_slug ),
 		);
 
-		return sprintf( $messages[$key], $count );
+		return sprintf( $messages[ $key ], $count );
 	}
 
 	/**
@@ -1260,22 +1302,22 @@ class wpTwitterWidget extends RangePlugin {
 	private function _getProfileImage( $user, $args = array() ) {
 		$linkAttrs = array(
 			'href'  => "http://twitter.com/{$user->screen_name}",
-			'title' => $user->name
+			'title' => $user->name,
 		);
-		$replace = ( 'original' == $args['avatar'] )? '.':"_{$args['avatar']}.";
-		$img = str_replace( '_normal.', $replace, $user->profile_image_url_https );
+		$replace   = ( 'original' == $args['avatar'] ) ? '.' : "_{$args['avatar']}.";
+		$img       = str_replace( '_normal.', $replace, $user->profile_image_url_https );
 
 		return $this->_buildLink( "<img alt='{$user->name}' src='{$img}' />", $linkAttrs, true );
 	}
 
-    /**
+	/**
 	 * Replace our shortCode with the "widget"
 	 *
 	 * @param array $attr - array of attributes from the shortCode
 	 * @param string $content - Content of the shortCode
 	 * @return string - formatted XHTML replacement for the shortCode
 	 */
-    public function handleShortcodes( $attr, $content = '' ) {
+	public function handleShortcodes( $attr, $content = '' ) {
 		$defaults = array(
 			'before_widget'   => '',
 			'after_widget'    => '',
@@ -1316,45 +1358,55 @@ class wpTwitterWidget extends RangePlugin {
 			unset( $attr['dateformat'] );
 		}
 
-		if ( !empty( $content ) && empty( $attr['title'] ) )
+		if ( ! empty( $content ) && empty( $attr['title'] ) ) {
 			$attr['title'] = $content;
+		}
 
+		$attr = shortcode_atts( $defaults, $attr );
 
-        $attr = shortcode_atts( $defaults, $attr );
-
-		if ( $attr['hidereplies'] && $attr['hidereplies'] != 'false' && $attr['hidereplies'] != '0' )
+		if ( $attr['hidereplies'] && $attr['hidereplies'] != 'false' && $attr['hidereplies'] != '0' ) {
 			$attr['hidereplies'] = 'true';
+		}
 
-		if ( $attr['showretweets'] && $attr['showretweets'] != 'false' && $attr['showretweets'] != '0' )
+		if ( $attr['showretweets'] && $attr['showretweets'] != 'false' && $attr['showretweets'] != '0' ) {
 			$attr['showretweets'] = 'true';
+		}
 
-		if ( $attr['showmentions'] && $attr['showmentions'] != 'false' && $attr['showmentions'] != '0' )
+		if ( $attr['showmentions'] && $attr['showmentions'] != 'false' && $attr['showmentions'] != '0' ) {
 			$attr['showmentions'] = 'true';
+		}
 
-		if ( $attr['hidefrom'] && $attr['hidefrom'] != 'false' && $attr['hidefrom'] != '0' )
+		if ( $attr['hidefrom'] && $attr['hidefrom'] != 'false' && $attr['hidefrom'] != '0' ) {
 			$attr['hidefrom'] = 'true';
+		}
 
-		if ( $attr['showintents'] && $attr['showintents'] != 'true' && $attr['showintents'] != '1' )
+		if ( $attr['showintents'] && $attr['showintents'] != 'true' && $attr['showintents'] != '1' ) {
 			$attr['showintents'] = 'false';
+		}
 
-		if ( $attr['showfollow'] && $attr['showfollow'] != 'true' && $attr['showfollow'] != '1' )
+		if ( $attr['showfollow'] && $attr['showfollow'] != 'true' && $attr['showfollow'] != '1' ) {
 			$attr['showfollow'] = 'false';
+		}
 
-		if ( !in_array( $attr['avatar'], array( 'bigger', 'normal', 'mini', 'original', '' ) ) )
+		if ( ! in_array( $attr['avatar'], array( 'bigger', 'normal', 'mini', 'original', '' ) ) ) {
 			$attr['avatar'] = 'normal';
+		}
 
-		if ( $attr['showXavisysLink'] && $attr['showXavisysLink'] != 'false' && $attr['showXavisysLink'] != '0' )
+		if ( $attr['showXavisysLink'] && $attr['showXavisysLink'] != 'false' && $attr['showXavisysLink'] != '0' ) {
 			$attr['showXavisysLink'] = 'true';
+		}
 
-		if ( $attr['targetBlank'] && $attr['targetBlank'] != 'false' && $attr['targetBlank'] != '0' )
+		if ( $attr['targetBlank'] && $attr['targetBlank'] != 'false' && $attr['targetBlank'] != '0' ) {
 			$attr['targetBlank'] = 'true';
+		}
 
 		return $this->display( $attr );
 	}
 
 	public function authed_users_option( $settings ) {
-		if ( ! is_array( $settings ) )
+		if ( ! is_array( $settings ) ) {
 			return array();
+		}
 		return $settings;
 	}
 
@@ -1389,10 +1441,11 @@ class wpTwitterWidget extends RangePlugin {
 	 * the old true/false to a size string
 	 */
 	private function fixAvatar( $settings ) {
-		if ( false === $settings['avatar'] )
+		if ( false === $settings['avatar'] ) {
 			$settings['avatar'] = '';
-		elseif ( !in_array( $settings['avatar'], array( 'bigger', 'normal', 'mini', 'original', false ) ) )
+		} elseif ( ! in_array( $settings['avatar'], array( 'bigger', 'normal', 'mini', 'original', false ) ) ) {
 			$settings['avatar'] = 'normal';
+		}
 
 		return $settings;
 	}
@@ -1404,13 +1457,15 @@ class wpTwitterWidget extends RangePlugin {
 	public function get_users_list( $authed = false ) {
 		$users = $this->_settings['twp-authed-users'];
 		if ( $authed ) {
-			if ( ! empty( $this->_authed_users ) )
+			if ( ! empty( $this->_authed_users ) ) {
 				return $this->_authed_users;
+			}
 			foreach ( $users as $key => $u ) {
 				$this->_wp_twitter_oauth->set_token( $u );
 				$rates = $this->_wp_twitter_oauth->send_authed_request( 'application/rate_limit_status', 'GET', array( 'resources' => 'statuses,lists' ) );
-				if ( is_wp_error( $rates ) )
-					unset( $users[$key] );
+				if ( is_wp_error( $rates ) ) {
+					unset( $users[ $key ] );
+				}
 			}
 			$this->_authed_users = $users;
 		}
@@ -1418,17 +1473,18 @@ class wpTwitterWidget extends RangePlugin {
 	}
 
 	public function get_lists() {
-		if ( ! empty( $this->_lists ) )
+		if ( ! empty( $this->_lists ) ) {
 			return $this->_lists;
-		$this->_lists =  array();
+		}
+		$this->_lists = array();
 		foreach ( $this->_settings['twp-authed-users'] as $key => $u ) {
 			$this->_wp_twitter_oauth->set_token( $u );
 			$user_lists = $this->_wp_twitter_oauth->send_authed_request( 'lists/list', 'GET', array( 'resources' => 'statuses,lists' ) );
 
 			if ( ! empty( $user_lists ) && ! is_wp_error( $user_lists ) ) {
-				$this->_lists[$key] = array();
+				$this->_lists[ $key ] = array();
 				foreach ( $user_lists as $l ) {
-					$this->_lists[$key][$l->id] = $l->name;
+					$this->_lists[ $key ][ $l->id ] = $l->name;
 				}
 			}
 		}
@@ -1436,13 +1492,15 @@ class wpTwitterWidget extends RangePlugin {
 	}
 
 	public function init() {
-		if ( isset( $_GET['twp-test-local-request'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'twp-test-local-request' ) )
+		if ( isset( $_GET['twp-test-local-request'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'twp-test-local-request' ) ) {
 			die( 'success' );
+		}
 	}
 
 	public function nonce_user_logged_out( $uid, $action ) {
-		if ( 'twp-test-local-request' == $action && isset( $_POST['uid'] ) )
+		if ( 'twp-test-local-request' == $action && isset( $_POST['uid'] ) ) {
 			$uid = absint( $_POST['uid'] );
+		}
 		return $uid;
 	}
 }
